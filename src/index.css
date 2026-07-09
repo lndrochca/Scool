@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #FFFFFF;
+  --card: #FFFFFF;
+  --border: #E5E5E7;
+  --border-soft: #EFEFF1;
+  --text: #1D1D1F;
+  --text-soft: #6E6E73;
+  --text-faint: #A1A1A6;
+  --black: #111113;
+
+  --green: #2FA84F;
+  --green-soft: #EAF6ED;
+  --orange: #E8720C;
+  --orange-soft: #FCEEE1;
+  --tan: #0071E3;
+  --tan-soft: #E8F1FD;
+  --red: #E0342A;
+  --red-soft: #FBEAE9;
+  --amber: #C79000;
+  --amber-soft: #FBF3DE;
+
+  --chip-bg: #F5F5F7;
+  --chip-text: #6E6E73;
+
+  --radius-lg: 18px;
+  --radius-md: 13px;
+  --radius-sm: 9px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 12px 28px -14px rgba(0, 0, 0, 0.14), 0 3px 8px -3px rgba(0, 0, 0, 0.05);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+ul { margin: 0; padding: 0; list-style: none; }
+
+*:focus-visible {
+  outline: 2px solid var(--black);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Shared control styles used across Library, Notes, Grades, Bookshelf, Subject Workspace */
+.btn-solid {
+  background: var(--black);
+  color: #fbf9f4;
+  border: none;
+  border-radius: 100px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: opacity 0.15s ease;
+}
+.btn-solid:hover { opacity: 0.85; }
+.btn-solid:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-solid svg { width: 15px; height: 15px; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-soft);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.btn-ghost:hover { background: var(--chip-bg); color: var(--text); }
+.btn-ghost svg { width: 15px; height: 15px; }
+
+.icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-faint);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+.icon-btn svg { width: 15px; height: 15px; }
+.icon-btn:hover { background: var(--chip-bg); color: var(--text); }
+.icon-btn.is-active { color: var(--amber); background: var(--amber-soft); }
+
+.subject-icon--tan, .lib-icon--tan, .note-icon--tan { background: var(--chip-bg); color: var(--tan); }
+.subject-icon--red, .lib-icon--red, .note-icon--red { background: var(--chip-bg); color: var(--red); }
+.subject-icon--amber, .lib-icon--amber, .note-icon--amber { background: var(--chip-bg); color: var(--amber); }
+.progress-fill--tan { background: var(--tan); }
+.progress-fill--red { background: var(--red); }
+.progress-fill--amber { background: var(--amber); }

@@ -1,0 +1,96 @@
+/* Shared primitives used across every page — layout, panel, and text utilities.
+   Feature-specific styles stay in each page/component's own CSS file. */
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 34px 32px 70px 32px;
+}
+
+.eyebrow {
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 8px;
+}
+.page-title {
+  font-size: 30px;
+  margin-bottom: 6px;
+}
+.page-sub {
+  color: var(--text-soft);
+  font-size: 14px;
+  margin: 0 0 28px 0;
+}
+
+/* Panels (cards with a header row) */
+.panel {
+  padding: 4px 6px;
+}
+.panel-tight {
+  padding: 4px 6px;
+  margin-bottom: 18px;
+}
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 6px 18px;
+}
+.panel-head h3 {
+  font-size: 16.5px;
+}
+.view-all {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+.view-all:hover {
+  text-decoration: underline;
+}
+
+/* Small text utilities */
+.chip {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--chip-bg);
+  color: var(--chip-text);
+  padding: 2px 8px;
+  border-radius: 100px;
+  letter-spacing: 0.02em;
+}
+.note-meta {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+/* Generic form + navigation primitives reused across pages */
+.notes-text-input, .notes-textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  resize: vertical;
+}
+.notes-text-input:focus, .notes-textarea:focus { outline: none; border-color: var(--text-faint); }
+
+.workspace-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 0;
+  margin-bottom: 18px;
+}
+.workspace-back:hover { color: var(--text); }
+.workspace-back svg { width: 14px; height: 14px; }

@@ -1,0 +1,45 @@
+.grades-list {
+  display: flex;
+  flex-direction: column;
+}
+.grades-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.grades-row:last-child {
+  border-bottom: none;
+}
+
+.grades-info {
+  flex: 1;
+  min-width: 0;
+}
+.grades-name {
+  font-weight: 600;
+  font-size: 13.3px;
+  margin-bottom: 7px;
+}
+.progress-track.small {
+  height: 5px;
+}
+
+.grades-numbers {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.grades-pct {
+  font-family: ui-monospace, monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.grades-letter {
+  font-size: 11px;
+  color: var(--text-faint);
+  font-weight: 600;
+}

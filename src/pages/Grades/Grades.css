@@ -1,0 +1,73 @@
+.grades-composer { padding: 20px; margin-bottom: 24px; }
+.grades-composer-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+@media (max-width: 760px) {
+  .grades-composer-row { grid-template-columns: 1fr; }
+}
+.grades-input-col { display: flex; flex-direction: column; gap: 8px; }
+.grades-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+.grades-label svg { width: 14px; height: 14px; }
+.grades-input-col textarea {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 14px;
+  font-size: 13.5px;
+  font-family: ui-monospace, monospace;
+  color: var(--text);
+  resize: vertical;
+}
+.grades-input-col textarea:focus { outline: none; border-color: var(--text-faint); }
+.grades-input-col--upload { justify-content: flex-start; }
+.grades-extract-btn { width: 100%; justify-content: center; padding: 12px; font-size: 14px; }
+
+.grades-draft { margin-bottom: 26px; }
+.grades-draft-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.grades-draft-chip {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.grades-subjects-panel { padding: 4px 6px; margin-bottom: 24px; }
+.grades-subject-list { display: flex; flex-direction: column; }
+.grades-subject-row {
+  border-bottom: 1px solid var(--border-soft);
+}
+.grades-subject-row:last-child { border-bottom: none; }
+.grades-subject-row.is-active { background: #F5F5F7; border-radius: 10px; }
+.grades-subject-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: transparent;
+  border: none;
+  text-align: left;
+}
+.grades-subject-btn:hover { background: #F5F5F7; border-radius: 10px; }
+.grades-subject-info { flex: 1; min-width: 0; }
+.grades-subject-pct {
+  font-family: ui-monospace, monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
