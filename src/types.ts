@@ -14,13 +14,28 @@ export interface Subject {
   pinned?: boolean;
   semester?: string;
   category?: string;
+  description?: string;
 }
+
+export type NoteSectionKind =
+  | "overview"
+  | "objectives"
+  | "key_concepts"
+  | "definitions"
+  | "important_points"
+  | "examples"
+  | "summary"
+  | "source"
+  | "custom";
 
 export interface NoteSection {
   id: string;
+  kind: NoteSectionKind;
   heading: string;
   bullets: string[];
 }
+
+export type NoteSourceType = "subject" | "paste" | "explain" | "upload";
 
 export interface Note {
   id: string;
@@ -31,57 +46,69 @@ export interface Note {
   icon: IconName;
   color: AccentColor;
   excerpt: string;
-  timeAgo: string;
-  sections?: NoteSection[];
+  createdAt: number;
+  updatedAt: number;
+  sections: NoteSection[];
+  personalNotes: string;
+  sourceType: NoteSourceType;
+  bookmarked?: boolean;
 }
 
-export interface GradeAssignment {
-  id: string;
-  name: string;
-  score: number | null;
-  maxScore: number;
-}
+export type GradeNodeKind = "folder" | "item";
 
-export interface GradeCategory {
+export interface GradeNode {
   id: string;
+  kind: GradeNodeKind;
   name: string;
   weightPercent: number;
-  assignments: GradeAssignment[];
+  collapsed?: boolean;
+  notes?: string;
+  date?: string;
+  children?: GradeNode[];
+  score?: number | null;
+  maxScore?: number;
 }
 
 export interface LibraryFile {
   id: string;
   name: string;
   kind: "pdf" | "image" | "file";
-  addedAt: string;
+  addedAt: number;
 }
+
+export type AssignmentPriority = "low" | "medium" | "high";
 
 export interface AssignmentItem {
   id: string;
   title: string;
   due: string;
   weightPercent: number;
+  priority: AssignmentPriority;
   done: boolean;
+}
+
+export type ResourceKind = "link" | "document" | "video";
+
+export interface LibraryResource {
+  id: string;
+  title: string;
+  kind: ResourceKind;
+  url: string;
+  category: string;
+  addedAt: number;
 }
 
 export type DueUrgency = "overdue" | "today" | "tomorrow" | "upcoming";
 
-export interface Deadline {
+export interface UpcomingItem {
   id: string;
   title: string;
-  subjectId?: string;
   subjectName: string;
+  weightPercent: number;
   icon: IconName;
   color: AccentColor;
-  weightPercent: number;
-  dueDate: string; // iso date string
-  completed: boolean;
-}
-
-export interface Profile {
-  name: string;
-  email: string;
-  semester: string;
+  due: string;
+  urgency: DueUrgency;
 }
 
 export interface Flashcard {
@@ -101,6 +128,8 @@ export interface FlashcardSet {
   createdAt: string;
 }
 
+export type WorkspaceTabTarget = "overview" | "notes" | "files" | "assignments" | "grades" | "assistant" | "resources";
+
 export type PageName =
   | "dashboard"
   | "notes"
@@ -108,6 +137,6 @@ export type PageName =
   | "library"
   | "bookshelf"
   | "flashcards"
-  | "settings"
   | "profile"
+  | "settings"
   | "subject";

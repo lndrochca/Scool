@@ -59,6 +59,56 @@
   font-size: 13.5px;
 }
 
+/* Set editor */
+.fc-editor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.fc-editor-card { padding: 14px 16px; }
+.fc-editor-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.fc-editor-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 640px) {
+  .fc-editor-fields { grid-template-columns: 1fr; }
+}
+.fc-editor-field label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  margin-bottom: 6px;
+}
+.fc-editor-field textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 11px;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--text);
+  resize: vertical;
+}
+.fc-editor-field textarea:focus { outline: none; border-color: var(--text-faint); }
+
+.fc-editor-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+}
+
 /* Study session */
 .fc-study-page { max-width: 720px; }
 .fc-study-head {

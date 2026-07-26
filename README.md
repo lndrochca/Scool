@@ -1,61 +1,42 @@
-# scool
+scool
+a modern study dashboard for staying organized, tracking progress, and managing schoolwork in one place.
 
-> a modern study dashboard for staying organized, tracking progress, and managing schoolwork in one place.
-
----
-
-## 🚀 overview
-
+🚀 overview
 scool is a React + TypeScript web app designed to help students manage classes, notes, grades, deadlines, flashcards, and study resources from a single dashboard.
 
----
+✨ features
+📊 dashboard
+active subjects and quick navigation
+upcoming deadlines and study reminders
+fast access to notes, grades, and resources
 
-## ✨ features
+📝 notes
+create and organize study notes
+keep recent notes visible for quick review
+structure notes by subject and topic
 
-### 📊 dashboard
+📈 grades
+track coursework and grade categories
+calculate grade progress with built-in logic
+monitor performance across subjects
 
-- active subjects and quick navigation
-- upcoming deadlines and study reminders
-- fast access to notes, grades, and resources
+📚 library and study tools
+browse resources in the library and bookshelf views
+explore subject workspaces
+support flashcards for revision
 
-### 📝 notes
+⚙️ profile and settings
+personalize your student profile
+adjust app preferences and account details
 
-- create and organize study notes
-- keep recent notes visible for quick review
-- structure notes by subject and topic
+🛠 tech stack
+React 19
+TypeScript
+Vite
+CSS-based UI styling
+local app state with context providers
 
-### 📈 grades
-
-- track coursework and grade categories
-- calculate grade progress with built-in logic
-- monitor performance across subjects
-
-### 📚 library and study tools
-
-- browse resources in the library and bookshelf views
-- explore subject workspaces
-- support flashcards for revision
-
-### ⚙️ profile and settings
-
-- personalize your student profile
-- adjust app preferences and account details
-
----
-
-## 🛠 tech stack
-
-- React 19
-- TypeScript
-- Vite
-- CSS-based UI styling
-- local app state with context providers
-
----
-
-## 📁 project structure
-
-```text
+📁 project structure
 scool/
 ├── src/
 │   ├── components/      # reusable ui components
@@ -64,47 +45,23 @@ scool/
 │   ├── data/            # mock data and generators
 │   └── types.ts         # shared type definitions
 └── public/              # static assets
-```
 
----
-
-## ⚙️ setup
-
-### 1. install dependencies
-
-```bash
+⚙️ setup
+1. install dependencies
 npm install
-```
-
-### 2. start the app
-
-```bash
+2. start the app
 npm run dev
-```
-
-### 3. build for production
-
-```bash
+3. build for production
 npm run build
-```
 
----
+📜 available scripts
+npm run dev starts the development server
+npm run build creates a production build
+npm run preview previews the production build locally
+npm run lint runs the linter
 
-## 📜 available scripts
-
-- `npm run dev` starts the development server
-- `npm run build` creates a production build
-- `npm run preview` previews the production build locally
-- `npm run lint` runs the linter
-
----
-
-## 📌 notes
-
+📌 notes
 The app currently uses mock data and in-memory state for a polished demo experience, so changes are reflected during the active session.
 
----
-
-## 📄 license
-
+📄 license
 this project is for personal or educational use.

@@ -1,3 +1,18 @@
+.workspace-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 0;
+  margin-bottom: 18px;
+}
+.workspace-back:hover { color: var(--text); }
+.workspace-back svg { width: 14px; height: 14px; }
+
 .workspace-head {
   display: flex;
   align-items: center;
@@ -41,6 +56,12 @@
   cursor: pointer;
 }
 .workspace-overview-note-row:last-child { border-bottom: none; }
+
+.notebook-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 .workspace-stat {
   padding: 16px;
   display: flex;
@@ -124,4 +145,52 @@
   padding: 10px 12px;
   background: var(--chip-bg);
   border-radius: 10px;
+}
+
+.workspace-section-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+.workspace-form {
+  padding: 16px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.workspace-form-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.workspace-form-row .notes-text-input,
+.workspace-form-row .notes-subject-select {
+  flex: 1;
+  min-width: 140px;
+}
+.workspace-row-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.workspace-file-row, .workspace-assignment-row {
+  align-items: center;
+}
+.workspace-resource-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.workspace-resource-row:last-child {
+  border-bottom: none;
+}
+.workspace-resource-row .note-title {
+  flex: 1;
+  text-decoration: none;
+}
+.workspace-resource-row .note-title:hover {
+  text-decoration: underline;
 }

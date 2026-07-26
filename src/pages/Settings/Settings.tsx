@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { CheckIcon } from "../../components/icons";
+import "../shared/page.css";
+import "../shared/settings-common.css";
+import "../../components/RecentNotes.css";
+import "../../components/UpcomingPanel.css";
 import "./Settings.css";
 
 interface ToggleRowProps {
@@ -46,15 +50,17 @@ export function Settings() {
 
   const [compactCards, setCompactCards] = useState(false);
   const [autoSaveNotes, setAutoSaveNotes] = useState(true);
+  const [signInMessage, setSignInMessage] = useState<string | null>(null);
 
   return (
     <section className="page settings-page">
       <div className="eyebrow">Settings</div>
-      <h1 className="page-title">Preferences</h1>
-      <p className="page-sub">Notifications, appearance, and account controls. Looking for name or email? That's under Profile.</p>
+      <h1 className="page-title">Customize Scool</h1>
+      <p className="page-sub">Notifications, appearance, and account preferences.</p>
 
       <div className="settings-grid">
         <div className="settings-col-main">
+          {/* Notifications */}
           <div className="card panel settings-panel">
             <div className="panel-head">
               <h3>Notifications</h3>
@@ -85,6 +91,7 @@ export function Settings() {
             />
           </div>
 
+          {/* Appearance */}
           <div className="card panel settings-panel">
             <div className="panel-head">
               <h3>Appearance</h3>
@@ -127,10 +134,25 @@ export function Settings() {
             <div className="panel-head" style={{ padding: "16px 16px 8px 16px" }}>
               <h3>Account</h3>
             </div>
+            <div className="settings-row" style={{ padding: "0 16px 12px" }}>
+              <div className="settings-row-text">
+                <div className="settings-row-label">Account Status</div>
+                <div className="settings-row-desc" style={{ fontWeight: 600, color: "var(--text)" }}>Guest</div>
+                <div className="settings-row-desc">
+                  You are currently using the application as a guest. Your data is stored locally until you sign in.
+                </div>
+              </div>
+            </div>
             <div className="settings-actions">
+              <button
+                className="settings-action settings-action--primary"
+                onClick={() => setSignInMessage("Sign in is coming soon — for now, everything you create stays saved locally as a guest.")}
+              >
+                Sign In / Create Account
+              </button>
+              {signInMessage && <p className="settings-row-desc" style={{ padding: "0 4px" }}>{signInMessage}</p>}
               <button className="settings-action">Export my data</button>
-              <button className="settings-action">Change password</button>
-              <button className="settings-action settings-action--danger">Delete account</button>
+              <button className="settings-action settings-action--danger">Clear local data</button>
             </div>
           </div>
         </div>

@@ -1,186 +1,188 @@
-import { useRef, useState, type ReactElement } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
-import { generateNotes } from "../../data/noteGenerator";
-import { NoteEditor } from "../../components/NoteEditor/NoteEditor";
-import { SubjectIcon, SparkleIcon, TextPasteIcon, TypeIcon, UploadQuickIcon } from "../../components/icons";
-import type { AccentColor, IconName, NoteSection } from "../../types";
-import "../../components/RecentNotes/RecentNotes.css";
+import { GeneratorPanel } from "./GeneratorPanel";
+import { NotebookGrid } from "./NotebookGrid";
+import { NotebookView } from "./NotebookView";
+import { BookmarkIcon, ClockIcon, SearchIcon, SubjectIcon } from "../../components/icons";
+import { formatTimeAgo } from "../../utils/time";
+import "../shared/page.css";
+import "../../components/RecentNotes.css";
 import "./Notes.css";
 
-type Mode = "subject" | "paste" | "explain" | "upload";
+type View = { kind: "grid" } | { kind: "notebook"; subjectId: string | null; scrollTo?: string };
 
-interface GeneratedResult {
-  title: string;
-  sections: NoteSection[];
-  icon: IconName;
-  color: AccentColor;
-  subjectName: string;
+interface Props {
+  onOpenFlashcards?: (setId: string) => void;
+  /** Set when arriving from a Quick Action so the generator opens immediately. */
+  autoOpenComposer?: boolean;
+  onAutoOpenConsumed?: () => void;
+  /** Set when arriving from a Dashboard "Recent Notes" click, to jump straight into that note. */
+  initialNoteId?: string | null;
+  onInitialNoteConsumed?: () => void;
 }
 
-const MODES: { key: Mode; label: string; icon: ReactElement; placeholder: string }[] = [
-  { key: "subject", label: "Subject Name", icon: <SparkleIcon />, placeholder: "e.g. Anatomy and Physiology" },
-  { key: "paste", label: "Paste Text", icon: <TextPasteIcon />, placeholder: "Paste a passage, article, or lecture transcript…" },
-  { key: "explain", label: "Type a Question", icon: <TypeIcon />, placeholder: "e.g. Explain Newton's Laws." },
-  { key: "upload", label: "Upload File", icon: <UploadQuickIcon />, placeholder: "" },
-];
+export function Notes({
+  onOpenFlashcards,
+  autoOpenComposer,
+  onAutoOpenConsumed,
+  initialNoteId,
+  onInitialNoteConsumed,
+}: Props) {
+  const { subjects, notes, recentlyViewedNoteIds } = useAppData();
+  const [view, setView] = useState<View>({ kind: "grid" });
+  const [query, setQuery] = useState("");
+  const [composerOpen, setComposerOpen] = useState(false);
 
-export function Notes() {
-  const { subjects, notes, addNote } = useAppData();
-  const [mode, setMode] = useState<Mode>("subject");
-  const [input, setInput] = useState("");
-  const [fileName, setFileName] = useState<string | null>(null);
-  const [generating, setGenerating] = useState(false);
-  const [result, setResult] = useState<GeneratedResult | null>(null);
-  const [selectedSubjectId, setSelectedSubjectId] = useState<string>("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (autoOpenComposer) {
+      setComposerOpen(true);
+      onAutoOpenConsumed?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoOpenComposer]);
 
-  const handleGenerate = () => {
-    const sourceText = mode === "paste" ? input : undefined;
-    const promptInput = mode === "upload" ? fileName ?? "Uploaded material" : input;
-    if (mode === "upload" && !fileName) return;
-    if (mode !== "upload" && !input.trim()) return;
+  useEffect(() => {
+    if (!initialNoteId) return;
+    const note = notes.find((n) => n.id === initialNoteId);
+    if (note) setView({ kind: "notebook", subjectId: note.subjectId ?? null, scrollTo: note.id });
+    onInitialNoteConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialNoteId]);
 
-    setGenerating(true);
-    setResult(null);
-    window.setTimeout(() => {
-      const generated = generateNotes(promptInput, sourceText);
-      setResult(generated);
-      setGenerating(false);
-    }, 650);
-  };
-
-  const handleSave = () => {
-    if (!result) return;
-    const subject = subjects.find((s) => s.id === selectedSubjectId);
-    addNote({
-      title: result.title,
-      subjectId: subject?.id,
-      subjectCode: subject?.code ?? "General",
-      subjectName: subject?.name ?? result.subjectName,
-      icon: result.icon,
-      color: result.color,
-      excerpt: result.sections[0]?.bullets[0] ?? "",
-      sections: result.sections,
+  const searchResults = useMemo(() => {
+    if (!query.trim()) return [];
+    const q = query.toLowerCase();
+    return notes.filter((n) => {
+      if (n.title.toLowerCase().includes(q)) return true;
+      if (n.subjectName.toLowerCase().includes(q)) return true;
+      return n.sections.some((s) => s.bullets.some((b) => b.toLowerCase().includes(q)));
     });
-    setResult(null);
-    setInput("");
-    setFileName(null);
+  }, [notes, query]);
+
+  const recentlyViewed = useMemo(
+    () => recentlyViewedNoteIds.map((id) => notes.find((n) => n.id === id)).filter((n): n is NonNullable<typeof n> => Boolean(n)),
+    [recentlyViewedNoteIds, notes]
+  );
+
+  const bookmarked = useMemo(() => notes.filter((n) => n.bookmarked), [notes]);
+
+  const openNotebookFor = (note: { subjectId?: string; id: string }) => {
+    setView({ kind: "notebook", subjectId: note.subjectId ?? null, scrollTo: note.id });
   };
+
+  if (view.kind === "notebook") {
+    const subject = view.subjectId ? subjects.find((s) => s.id === view.subjectId) ?? null : null;
+    const notebookNotes = notes.filter((n) => (view.subjectId ? n.subjectId === view.subjectId : !n.subjectId));
+    return (
+      <section className="page">
+        <div className="eyebrow">Notes Workspace</div>
+        <NotebookView
+          subject={subject}
+          notes={notebookNotes}
+          onBack={() => setView({ kind: "grid" })}
+          scrollToNoteId={view.scrollTo ?? null}
+          onOpenFlashcards={onOpenFlashcards}
+        />
+      </section>
+    );
+  }
 
   return (
     <section className="page">
-      <div className="eyebrow">AI Notes Generator</div>
-      <h1 className="page-title">Turn material into study notes</h1>
-      <p className="page-sub">Upload a file, paste text, or describe a topic — Scool organizes it into structured notes.</p>
+      <div className="eyebrow">Notes Workspace</div>
+      <h1 className="page-title">Your notebooks</h1>
+      <p className="page-sub">Every subject has its own notebook, organized automatically from your AI-generated notes.</p>
 
-      <div className="card notes-composer">
-        <div className="notes-mode-tabs">
-          {MODES.map((m) => (
-            <button
-              key={m.key}
-              className={`notes-mode-tab ${mode === m.key ? "is-active" : ""}`}
-              onClick={() => {
-                setMode(m.key);
-                setResult(null);
-              }}
-            >
-              {m.icon}
-              {m.label}
-            </button>
-          ))}
+      <div className="notebook-toolbar">
+        <div className="notebook-search notebook-search--wide">
+          <SearchIcon />
+          <input
+            placeholder="Search all your notes…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
         </div>
-
-        <div className="notes-input-area">
-          {mode === "upload" ? (
-            <div className="notes-upload">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.png,.jpg,.jpeg"
-                style={{ display: "none" }}
-                onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
-              />
-              <button className="btn-ghost" onClick={() => fileInputRef.current?.click()}>
-                <UploadQuickIcon /> Choose PDF, image, or screenshot
-              </button>
-              {fileName && <span className="notes-filename">{fileName}</span>}
-            </div>
-          ) : mode === "subject" ? (
-            <input
-              className="notes-text-input"
-              placeholder={MODES.find((m) => m.key === mode)?.placeholder}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
-            />
-          ) : (
-            <textarea
-              className="notes-textarea"
-              rows={mode === "paste" ? 6 : 3}
-              placeholder={MODES.find((m) => m.key === mode)?.placeholder}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-            />
-          )}
-        </div>
-
-        <button className="btn-solid notes-generate-btn" onClick={handleGenerate} disabled={generating}>
-          <SparkleIcon /> {generating ? "Generating notes…" : "Generate Notes"}
+        <button className="btn-solid" onClick={() => setComposerOpen((v) => !v)}>
+          {composerOpen ? "Close" : "+ Generate Notes"}
         </button>
       </div>
 
-      {result && (
-        <div className="notes-result">
-          <div className="notes-result-head">
-            <div>
-              <div className="eyebrow" style={{ marginBottom: 4 }}>Editable draft</div>
-              <input
-                className="notes-title-input"
-                value={result.title}
-                onChange={(e) => setResult({ ...result, title: e.target.value })}
-              />
-            </div>
-            <div className="notes-save-row">
-              <select
-                className="notes-subject-select"
-                value={selectedSubjectId}
-                onChange={(e) => setSelectedSubjectId(e.target.value)}
-              >
-                <option value="">Save without a subject</option>
-                {subjects.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-              </select>
-              <button className="btn-solid" onClick={handleSave}>Save Note</button>
-            </div>
-          </div>
-          <NoteEditor sections={result.sections} onChange={(sections) => setResult({ ...result, sections })} />
-        </div>
+      {composerOpen && (
+        <GeneratorPanel
+          onSaved={(_id, subjectId) => { setComposerOpen(false); setView({ kind: "notebook", subjectId: subjectId ?? null }); }}
+          onOpenFlashcards={onOpenFlashcards}
+        />
       )}
 
-      <div className="card notes-recent">
-        <div className="panel-head">
-          <h3>Saved Notes</h3>
-        </div>
-        <ul className="note-list">
-          {notes.slice(0, 8).map((note) => (
-            <li className="note-row" key={note.id}>
-              <span className={`note-icon note-icon--${note.color}`}>
-                <SubjectIcon name={note.icon} />
-              </span>
-              <div className="note-body">
-                <div className="note-title-row">
-                  <span className="note-title">{note.title}</span>
-                  <span className="chip">{note.subjectCode}</span>
+      {query.trim() ? (
+        <div className="card notes-recent">
+          <div className="panel-head">
+            <h3>Results for "{query}"</h3>
+          </div>
+          <ul className="note-list">
+            {searchResults.map((n) => (
+              <li className="note-row" key={n.id} onClick={() => openNotebookFor(n)} style={{ cursor: "pointer" }}>
+                <span className={`note-icon note-icon--${n.color}`}>
+                  <SubjectIcon name={n.icon} />
+                </span>
+                <div className="note-body">
+                  <div className="note-title-row">
+                    <span className="note-title">{n.title}</span>
+                    <span className="chip">{n.subjectCode}</span>
+                  </div>
+                  <p className="note-excerpt">{n.excerpt}</p>
+                  <div className="note-meta">{n.subjectName} · {formatTimeAgo(n.updatedAt)}</div>
                 </div>
-                <p className="note-excerpt">{note.excerpt}</p>
-                <div className="note-meta">{note.subjectName} · {note.timeAgo}</div>
-              </div>
-            </li>
-          ))}
-          {notes.length === 0 && <li className="notes-empty">No notes yet — generate your first one above.</li>}
-        </ul>
-      </div>
+              </li>
+            ))}
+            {searchResults.length === 0 && <li className="notes-empty">No notes match "{query}".</li>}
+          </ul>
+        </div>
+      ) : (
+        <>
+          {(recentlyViewed.length > 0 || bookmarked.length > 0) && (
+            <div className="notebook-shortcuts">
+              {recentlyViewed.length > 0 && (
+                <div className="card notebook-shortcut-panel">
+                  <div className="panel-head" style={{ padding: "14px 16px 6px 16px" }}>
+                    <h3><ClockIcon className="notebook-shortcut-icon" /> Recently Viewed</h3>
+                  </div>
+                  <ul className="notebook-shortcut-list">
+                    {recentlyViewed.slice(0, 5).map((n) => (
+                      <li key={n.id} onClick={() => openNotebookFor(n)}>
+                        <span className="note-title">{n.title}</span>
+                        <span className="note-meta">{n.subjectName}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {bookmarked.length > 0 && (
+                <div className="card notebook-shortcut-panel">
+                  <div className="panel-head" style={{ padding: "14px 16px 6px 16px" }}>
+                    <h3><BookmarkIcon className="notebook-shortcut-icon" filled /> Bookmarked</h3>
+                  </div>
+                  <ul className="notebook-shortcut-list">
+                    {bookmarked.slice(0, 5).map((n) => (
+                      <li key={n.id} onClick={() => openNotebookFor(n)}>
+                        <span className="note-title">{n.title}</span>
+                        <span className="note-meta">{n.subjectName}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          <NotebookGrid
+            subjects={subjects}
+            notes={notes}
+            onOpen={(subjectId) => setView({ kind: "notebook", subjectId })}
+            onStartGenerating={() => setComposerOpen(true)}
+          />
+        </>
+      )}
     </section>
   );
 }

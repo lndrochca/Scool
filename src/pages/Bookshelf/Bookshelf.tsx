@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
 import { SubjectIcon } from "../../components/icons";
 import { PinIcon } from "../../components/icons";
+import "../shared/page.css";
 import "./Bookshelf.css";
 
 type GroupBy = "none" | "semester" | "category";
@@ -62,6 +63,12 @@ export function Bookshelf({ onOpenSubject }: { onOpenSubject: (id: string) => vo
           </button>
         ))}
       </div>
+
+      {subjects.length === 0 && (
+        <div className="card" style={{ padding: 24, textAlign: "center" }}>
+          Your library is empty. Create your first subject to get started.
+        </div>
+      )}
 
       {groups.map((group) => (
         <div className="shelf-group" key={group.label}>

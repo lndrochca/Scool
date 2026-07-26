@@ -1,0 +1,138 @@
+.pager {
+  outline: none;
+}
+
+.pager-page-wrap {
+  position: relative;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  min-height: 220px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.pager-page {
+  padding: 22px 56px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Subtle, lightweight page-turn: a soft slide + fade rather than a 3D flip. */
+@keyframes pager-slide-next {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes pager-slide-prev {
+  from { opacity: 0; transform: translateX(-18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.pager-page--next { animation: pager-slide-next 0.22s ease both; }
+.pager-page--prev { animation: pager-slide-prev 0.22s ease both; }
+
+.pager-page-heading {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  margin: 0 0 12px 0;
+}
+.pager-bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pager-bullets li {
+  display: flex;
+  gap: 9px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+}
+.pager-bullets li .note-editor-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  margin-top: 9px;
+  flex-shrink: 0;
+}
+
+.pager-personal-hint {
+  font-size: 12px;
+  color: var(--text-faint);
+  margin: 0 0 10px 0;
+}
+.pager-personal-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--chip-bg);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--text);
+  resize: vertical;
+}
+.pager-personal-input:focus { outline: none; border-color: var(--text-faint); }
+
+/* Corner / edge click zones for page-flip navigation */
+.pager-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 15%;
+  min-width: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.pager-edge:disabled { cursor: default; }
+.pager-edge--left { left: 0; }
+.pager-edge--right { right: 0; }
+.pager-edge:not(:disabled):hover {
+  background: linear-gradient(to var(--edge-dir, right), rgba(23, 21, 15, 0.03), transparent);
+}
+.pager-edge--left:not(:disabled):hover { --edge-dir: left; }
+
+.pager-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+}
+.pager-nav-btn { font-size: 12.5px; padding: 8px 14px; }
+.pager-nav-btn:disabled { opacity: 0.35; cursor: default; }
+
+.pager-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pager-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  border: none;
+  padding: 0;
+}
+.pager-dot.is-active {
+  background: var(--text);
+  width: 16px;
+  border-radius: 100px;
+  transition: width 0.15s ease;
+}
+
+.pager-page-count {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-top: 8px;
+}
+
+@media (max-width: 560px) {
+  .pager-page { padding: 20px 34px; }
+  .pager-edge { width: 12%; }
+}

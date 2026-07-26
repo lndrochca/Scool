@@ -1,4 +1,4 @@
-import type { AccentColor, Flashcard, IconName } from "../types";
+import type { AccentColor, Flashcard, IconName, NoteSection, NoteSectionKind } from "../types";
 
 interface Template {
   match: string[];
@@ -106,4 +106,75 @@ export function generateFlashcards(subjectOrTopic: string): {
     color: template.color,
     cards: template.cards.map((c) => ({ id: id(), front: c.front, back: c.back })),
   };
+}
+
+const STOPWORDS = new Set([
+  "the", "and", "that", "with", "from", "this", "into", "your", "their", "which", "these",
+  "have", "will", "each", "than", "then", "when", "what", "such", "over", "also", "used",
+  "using", "about", "through", "across", "toward", "before", "after", "while", "where",
+  "there", "being", "were", "does", "often", "most", "some", "into", "onto", "upon",
+]);
+
+function pickBlankWord(sentence: string): string | null {
+  const words = sentence.match(/[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ'-]{2,}/g) ?? [];
+  const candidates = words.filter((w) => !STOPWORDS.has(w.toLowerCase()));
+  if (candidates.length === 0) return null;
+  return candidates.reduce((best, w) => (w.length > best.length ? w : best), candidates[0]);
+}
+
+function makeClozeCard(sentence: string, sectionLabel: string): { front: string; back: string } | null {
+  const blankWord = pickBlankWord(sentence);
+  if (!blankWord) return null;
+  const pattern = new RegExp(`\\b${blankWord.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`);
+  const redacted = sentence.replace(pattern, "_____");
+  if (redacted === sentence) return null;
+  return { front: `(${sectionLabel}) Fill in the blank: ${redacted}`, back: blankWord };
+}
+
+function parseDefinitionBullet(bullet: string): { front: string; back: string } | null {
+  const parts = bullet.split(/\s+[—–-]\s+/);
+  if (parts.length < 2) return null;
+  const [term, ...rest] = parts;
+  const definition = rest.join(" — ").trim();
+  if (!term.trim() || !definition) return null;
+  return { front: `What is ${term.trim()}?`, back: definition };
+}
+
+const FLASHCARD_SOURCE_KINDS: NoteSectionKind[] = [
+  "definitions",
+  "key_concepts",
+  "important_points",
+  "examples",
+  "objectives",
+];
+
+export function generateFlashcardsFromSections(
+  sections: NoteSection[],
+  opts: { limit?: number } = {}
+): Flashcard[] {
+  const limit = opts.limit ?? 14;
+  const cards: { front: string; back: string }[] = [];
+
+  for (const section of sections) {
+    if (!FLASHCARD_SOURCE_KINDS.includes(section.kind)) continue;
+
+    for (const bullet of section.bullets) {
+      if (cards.length >= limit) break;
+      const clean = bullet.trim();
+      if (!clean) continue;
+
+      if (section.kind === "definitions") {
+        const parsed = parseDefinitionBullet(clean);
+        if (parsed) {
+          cards.push(parsed);
+          continue;
+        }
+      }
+
+      const cloze = makeClozeCard(clean, section.heading);
+      if (cloze) cards.push(cloze);
+    }
+  }
+
+  return cards.map((c) => ({ id: id(), front: c.front, back: c.back }));
 }

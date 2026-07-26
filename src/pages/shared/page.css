@@ -1,0 +1,29 @@
+/* Shared base layout for every top-level page.
+   Import this in any page component that renders a `.page` section
+   (eyebrow / title / subtitle header pattern). */
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 34px 32px 70px 32px;
+}
+
+.eyebrow {
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 8px;
+}
+
+.page-title {
+  font-size: 30px;
+  margin-bottom: 6px;
+}
+
+.page-sub {
+  color: var(--text-soft);
+  font-size: 14px;
+  margin: 0 0 28px 0;
+}

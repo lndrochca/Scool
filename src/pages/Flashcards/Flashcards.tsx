@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
 import { generateFlashcards } from "../../data/flashcardGenerator";
-import { SubjectIcon, SparkleIcon, ShuffleIcon, TrashIcon, XIcon, CheckIcon, BackIcon } from "../../components/icons";
+import { SubjectIcon, SparkleIcon, ShuffleIcon, TrashIcon, XIcon, CheckIcon, BackIcon, PlusIcon, PencilIcon } from "../../components/icons";
+import type { Flashcard, FlashcardSet } from "../../types";
+import "../shared/page.css";
+import "../../components/RecentNotes.css";
+import "../Notes/Notes.css";
+import "../SubjectWorkspace/SubjectWorkspace.css";
 import "./Flashcards.css";
 
 function shuffle<T>(arr: T[]): T[] {
@@ -13,11 +18,26 @@ function shuffle<T>(arr: T[]): T[] {
   return copy;
 }
 
-export function Flashcards() {
+interface Props {
+  /** When set (e.g. right after "Turn into Flashcard Quiz" from Notes), opens straight into editing that set. */
+  initialSetId?: string | null;
+  onInitialConsumed?: () => void;
+}
+
+export function Flashcards({ initialSetId, onInitialConsumed }: Props = {}) {
   const { flashcardSets, addFlashcardSet, deleteFlashcardSet } = useAppData();
   const [topic, setTopic] = useState("");
   const [generating, setGenerating] = useState(false);
   const [activeSetId, setActiveSetId] = useState<string | null>(null);
+  const [mode, setMode] = useState<"list" | "edit" | "study">("list");
+
+  useEffect(() => {
+    if (!initialSetId) return;
+    setActiveSetId(initialSetId);
+    setMode("edit");
+    onInitialConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSetId]);
 
   const activeSet = flashcardSets.find((s) => s.id === activeSetId) ?? null;
 
@@ -36,18 +56,29 @@ export function Flashcards() {
       setTopic("");
       setGenerating(false);
       setActiveSetId(newId);
+      setMode("edit");
     }, 600);
   };
 
-  if (activeSet) {
-    return <StudySession set={activeSet} onExit={() => setActiveSetId(null)} />;
+  if (activeSet && mode === "edit") {
+    return (
+      <SetEditor
+        set={activeSet}
+        onExit={() => { setActiveSetId(null); setMode("list"); }}
+        onStudy={() => setMode("study")}
+      />
+    );
+  }
+
+  if (activeSet && mode === "study") {
+    return <StudySession set={activeSet} onExit={() => { setActiveSetId(null); setMode("list"); }} />;
   }
 
   return (
     <section className="page">
       <div className="eyebrow">AI Flashcards</div>
       <h1 className="page-title">Quiz yourself before it counts</h1>
-      <p className="page-sub">Generate a flashcard set from a subject or topic, then run through it as a quick self-quiz.</p>
+      <p className="page-sub">Generate a flashcard set from a subject or topic, then run through it as a quick self-quiz. You can also turn any AI note into a flashcard set right from the Notes workspace.</p>
 
       <div className="card fc-composer">
         <label className="fc-label"><SparkleIcon /> Generate from a subject or topic</label>
@@ -68,7 +99,7 @@ export function Flashcards() {
       <div className="fc-grid">
         {flashcardSets.map((set) => (
           <div className="card fc-set-card" key={set.id}>
-            <button className="fc-set-main" onClick={() => setActiveSetId(set.id)}>
+            <button className="fc-set-main" onClick={() => { setActiveSetId(set.id); setMode("study"); }}>
               <span className={`subject-icon subject-icon--${set.color}`}>
                 <SubjectIcon name={set.icon} />
               </span>
@@ -77,14 +108,95 @@ export function Flashcards() {
                 <div className="note-meta">{set.subjectName} · {set.cards.length} cards</div>
               </div>
             </button>
+            <button
+              className="icon-btn fc-set-delete"
+              aria-label="Edit set"
+              title="Edit cards"
+              onClick={() => { setActiveSetId(set.id); setMode("edit"); }}
+            >
+              <PencilIcon />
+            </button>
             <button className="icon-btn fc-set-delete" onClick={() => deleteFlashcardSet(set.id)} aria-label="Delete set">
               <TrashIcon />
             </button>
           </div>
         ))}
         {flashcardSets.length === 0 && (
-          <div className="fc-empty">No flashcard sets yet — generate your first one above.</div>
+          <div className="fc-empty">No flashcard sets yet — generate your first one above, or turn any AI note into a quiz from the Notes workspace.</div>
         )}
+      </div>
+    </section>
+  );
+}
+
+let editUid = 0;
+function newCardId() {
+  editUid += 1;
+  return `fc-new-${Date.now().toString(36)}${editUid}`;
+}
+
+function SetEditor({ set, onExit, onStudy }: { set: FlashcardSet; onExit: () => void; onStudy: () => void }) {
+  const { updateFlashcardSetCards } = useAppData();
+  const [cards, setCards] = useState<Flashcard[]>(set.cards);
+
+  useEffect(() => {
+    setCards(set.cards);
+    // Only re-sync when switching which set is being edited, not on every local edit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [set.id]);
+
+  const commit = (next: Flashcard[]) => {
+    setCards(next);
+    updateFlashcardSetCards(set.id, next);
+  };
+
+  const updateCard = (id: string, patch: Partial<Flashcard>) => {
+    commit(cards.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+  };
+
+  const removeCard = (id: string) => {
+    commit(cards.filter((c) => c.id !== id));
+  };
+
+  const addCard = () => {
+    commit([...cards, { id: newCardId(), front: "", back: "" }]);
+  };
+
+  return (
+    <section className="page">
+      <button className="workspace-back" onClick={onExit}><BackIcon /> Back to Flashcards</button>
+
+      <div className="eyebrow">{set.subjectName}</div>
+      <h1 className="page-title" style={{ marginBottom: 4 }}>{set.title}</h1>
+      <p className="page-sub">Review the AI-generated cards below — edit any of them, remove ones you don't need, or add your own before you start studying.</p>
+
+      <div className="fc-editor-list">
+        {cards.map((c, i) => (
+          <div className="card fc-editor-card" key={c.id}>
+            <div className="fc-editor-card-head">
+              <span className="note-meta">Card {i + 1}</span>
+              <button className="icon-btn" aria-label="Remove card" onClick={() => removeCard(c.id)}>
+                <TrashIcon />
+              </button>
+            </div>
+            <div className="fc-editor-fields">
+              <div className="fc-editor-field">
+                <label>Question</label>
+                <textarea rows={2} value={c.front} onChange={(e) => updateCard(c.id, { front: e.target.value })} />
+              </div>
+              <div className="fc-editor-field">
+                <label>Answer</label>
+                <textarea rows={2} value={c.back} onChange={(e) => updateCard(c.id, { back: e.target.value })} />
+              </div>
+            </div>
+          </div>
+        ))}
+        {cards.length === 0 && <p className="notes-empty">No cards yet — add one below.</p>}
+      </div>
+
+      <div className="fc-editor-actions">
+        <button className="btn-ghost" onClick={addCard}><PlusIcon /> Add your own card</button>
+        <button className="btn-solid" onClick={onStudy} disabled={cards.length === 0}>Start Studying</button>
       </div>
     </section>
   );

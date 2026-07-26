@@ -1,7 +1,6 @@
 import type { ReactElement } from "react";
-import type { PageName } from "../../types";
-import { useAppData } from "../../context/AppDataContext";
-import { FlashcardIcon, MenuIcon, SettingsIcon } from "../icons";
+import type { PageName } from "../types";
+import { FlashcardIcon, MenuIcon, SettingsIcon, UserIcon } from "./icons";
 import "./TopNav.css";
 
 const NAV_ITEMS: { key: PageName; label: string; icon: ReactElement }[] = [
@@ -73,15 +72,6 @@ interface TopNavProps {
 }
 
 export function TopNav({ current, onNavigate, mobileOpen, onToggleMobile }: TopNavProps) {
-  const { profile } = useAppData();
-  const initials = profile.name
-    .split(" ")
-    .filter(Boolean)
-    .map((p) => p[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
   return (
     <header className="topnav">
       <div className="topnav-inner">
@@ -105,18 +95,21 @@ export function TopNav({ current, onNavigate, mobileOpen, onToggleMobile }: TopN
 
         <div className="topnav-right">
           <button
+            className={`topnav-link settings-link ${current === "profile" ? "active" : ""}`}
+            onClick={() => onNavigate("profile")}
+          >
+            <UserIcon className="topnav-link-icon" />
+            <span className="settings-label">Profile</span>
+          </button>
+          <button
             className={`topnav-link settings-link ${current === "settings" ? "active" : ""}`}
             onClick={() => onNavigate("settings")}
           >
             <SettingsIcon className="topnav-link-icon" />
             <span className="settings-label">Settings</span>
           </button>
-          <button
-            className={`avatar-btn ${current === "profile" ? "active" : ""}`}
-            onClick={() => onNavigate("profile")}
-            aria-label={`Profile — ${profile.name}`}
-          >
-            <span className="avatar">{initials || "?"}</span>
+          <button className="avatar avatar-btn" aria-label="Open profile (Guest)" onClick={() => onNavigate("profile")}>
+            G
           </button>
           <button className="menu-btn" aria-label="Toggle menu" onClick={onToggleMobile}>
             <MenuIcon />

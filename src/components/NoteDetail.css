@@ -1,0 +1,44 @@
+.note-detail {
+  padding: 0;
+  overflow: hidden;
+}
+.note-detail-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+}
+.note-detail-head:hover { background: var(--chip-bg); }
+.note-detail-headtext { flex: 1; min-width: 0; }
+.note-detail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.note-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.note-detail-bookmark.is-active { color: var(--amber); background: var(--amber-soft); }
+.note-detail-flashcard-btn:hover { color: var(--orange); background: var(--chip-bg); }
+.note-detail-chevron {
+  width: 15px;
+  height: 15px;
+  color: var(--text-faint);
+  transition: transform 0.15s ease;
+  margin-left: 4px;
+}
+.note-detail-chevron.is-open { transform: rotate(180deg); }
+
+.note-detail-body {
+  padding: 6px 18px 20px 18px;
+  border-top: 1px solid var(--border-soft);
+}

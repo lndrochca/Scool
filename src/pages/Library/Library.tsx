@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
 import { SubjectIcon } from "../../components/icons";
 import { PinIcon, PlusIcon, SearchIcon, DotsIcon, PencilIcon, TrashIcon, CheckIcon, XIcon } from "../../components/icons";
 import type { AccentColor, IconName } from "../../types";
+import "../shared/page.css";
 import "./Library.css";
 
 type SortKey = "name" | "grade" | "notes";
@@ -10,7 +11,13 @@ type SortKey = "name" | "grade" | "notes";
 const ICON_OPTIONS: IconName[] = ["biology", "calculus", "history", "physics", "english"];
 const COLOR_OPTIONS: AccentColor[] = ["green", "orange", "tan", "red", "amber"];
 
-export function Library({ onOpenSubject }: { onOpenSubject: (id: string) => void }) {
+interface Props {
+  onOpenSubject: (id: string) => void;
+  autoOpenAdd?: boolean;
+  onAutoOpenConsumed?: () => void;
+}
+
+export function Library({ onOpenSubject, autoOpenAdd, onAutoOpenConsumed }: Props) {
   const { subjects, addSubject, renameSubject, deleteSubject, togglePin } = useAppData();
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("name");
@@ -22,6 +29,14 @@ export function Library({ onOpenSubject }: { onOpenSubject: (id: string) => void
   const [newCode, setNewCode] = useState("");
   const [newIcon, setNewIcon] = useState<IconName>("biology");
   const [newColor, setNewColor] = useState<AccentColor>("green");
+
+  useEffect(() => {
+    if (autoOpenAdd) {
+      setShowAdd(true);
+      onAutoOpenConsumed?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoOpenAdd]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -209,7 +224,10 @@ export function Library({ onOpenSubject }: { onOpenSubject: (id: string) => void
           </div>
         ))}
 
-        {filtered.length === 0 && (
+        {filtered.length === 0 && subjects.length === 0 && (
+          <div className="card lib-empty">No subjects yet. Create your first subject to begin.</div>
+        )}
+        {filtered.length === 0 && subjects.length > 0 && (
           <div className="card lib-empty">No subjects match “{query}”.</div>
         )}
       </div>

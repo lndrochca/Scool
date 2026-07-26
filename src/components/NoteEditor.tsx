@@ -1,5 +1,5 @@
-import type { NoteSection } from "../../types";
-import { PlusIcon, TrashIcon } from "../icons";
+import type { NoteSection } from "../types";
+import { PlusIcon, TrashIcon } from "./icons";
 import "./NoteEditor.css";
 
 let uid = 0;
@@ -34,7 +34,7 @@ export function NoteEditor({ sections, onChange }: Props) {
     onChange(sections.filter((s) => s.id !== sid));
   };
   const addSection = () => {
-    onChange([...sections, { id: id(), heading: "New Section", bullets: [""] }]);
+    onChange([...sections, { id: id(), kind: "custom", heading: "New Section", bullets: [""] }]);
   };
 
   return (
