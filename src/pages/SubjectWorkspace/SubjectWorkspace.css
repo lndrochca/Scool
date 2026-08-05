@@ -40,7 +40,7 @@
   white-space: nowrap;
 }
 .workspace-tab:hover { color: var(--text); }
-.workspace-tab.is-active { color: var(--text); border-bottom-color: var(--black); }
+.workspace-tab.is-active { color: var(--text); border-bottom-color: var(--accent); }
 
 .workspace-overview-grid {
   display: grid;

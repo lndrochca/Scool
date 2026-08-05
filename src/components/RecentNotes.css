@@ -34,7 +34,7 @@
   border-bottom: none;
 }
 .note-row:hover {
-  background: #F5F5F7;
+  background: var(--chip-bg);
   cursor: pointer;
   border-radius: 10px;
 }

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
-import { CheckIcon, PencilIcon } from "../../components/icons";
+import { useAuth } from "../../context/AuthContext";
+import { CheckIcon, CloudCheckIcon, LockIcon, LogOutIcon, PencilIcon } from "../../components/icons";
 import "../shared/page.css";
 import "../shared/settings-common.css";
 import "../../components/RecentNotes.css";
@@ -9,57 +10,105 @@ import "./Profile.css";
 
 export function Profile() {
   const { subjects, notes } = useAppData();
+  const { user, isGuest, openAuthModal, signOut, updateName } = useAuth();
 
-  // No account exists yet — Guest Mode. A display name is optional and local-only
-  // until authentication is implemented; nothing here is a preset fake identity.
-  const [name, setName] = useState("");
+  const [name, setName] = useState(user?.name ?? "");
   const [editingProfile, setEditingProfile] = useState(false);
+  const [savingName, setSavingName] = useState(false);
+  const [signOutBusy, setSignOutBusy] = useState(false);
 
-  const displayName = name.trim() || "Guest";
-  const initials = name.trim()
-    ? name.trim().split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase()
+  useEffect(() => setName(user?.name ?? ""), [user]);
+
+  const initials = user
+    ? user.name.trim().split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase() || "U"
     : "G";
+
+  const handleDone = async () => {
+    if (user && name.trim() && name.trim() !== user.name) {
+      setSavingName(true);
+      await updateName(name.trim());
+      setSavingName(false);
+    }
+    setEditingProfile(false);
+  };
 
   return (
     <section className="page settings-page">
       <div className="eyebrow">Profile</div>
       <h1 className="page-title">Your profile</h1>
-      <p className="page-sub">You're using Scool as a guest. Set a local display name if you'd like — it'll be replaced automatically once sign-in is available.</p>
+      <p className="page-sub">
+        {isGuest
+          ? "You're exploring Scool as a guest. Sign in to save your data permanently and sync across devices."
+          : "Manage your account and see how your data is stored."}
+      </p>
 
       <div className="settings-grid">
         <div className="settings-col-main">
-          <div className="card panel settings-panel">
-            <div className="panel-head">
-              <h3>Profile</h3>
-              {!editingProfile ? (
-                <button className="settings-edit-btn" onClick={() => setEditingProfile(true)}>
-                  <PencilIcon /> Edit
-                </button>
-              ) : (
-                <button className="settings-edit-btn settings-edit-btn--done" onClick={() => setEditingProfile(false)}>
-                  <CheckIcon /> Done
-                </button>
-              )}
+          {isGuest ? (
+            <div className="card panel settings-panel guest-hero">
+              <div className="guest-hero-icon">
+                <LockIcon />
+              </div>
+              <h3 className="guest-hero-title">You're in Guest Mode</h3>
+              <p className="guest-hero-sub">
+                Everything you create — subjects, notes, grades, flashcards — is saved locally in this browser only. It won't
+                sync to other devices, and it can be lost if you clear your browser data. Sign in for free to keep it
+                permanently.
+              </p>
+              <ul className="guest-hero-list">
+                <li>Explore every feature, no account required</li>
+                <li>Sign in any time — nothing you've made as a guest is lost</li>
+                <li>Free accounts sync across all your devices</li>
+              </ul>
+              <button className="btn-solid guest-hero-cta" onClick={() => openAuthModal("sign-up", "save")}>
+                Sign In / Create Account
+              </button>
             </div>
-            <div className="settings-profile">
-              <div className="settings-avatar">{initials}</div>
-              <div className="settings-profile-fields">
-                {editingProfile ? (
-                  <input
-                    className="settings-input"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Display name (optional)"
-                  />
+          ) : (
+            <div className="card panel settings-panel">
+              <div className="panel-head">
+                <h3>Profile</h3>
+                {!editingProfile ? (
+                  <button className="settings-edit-btn" onClick={() => setEditingProfile(true)}>
+                    <PencilIcon /> Edit
+                  </button>
                 ) : (
-                  <>
-                    <div className="settings-profile-name">{displayName}</div>
-                    <div className="settings-profile-email">Guest account — no email on file</div>
-                  </>
+                  <button className="settings-edit-btn settings-edit-btn--done" onClick={handleDone} disabled={savingName}>
+                    <CheckIcon /> {savingName ? "Saving…" : "Done"}
+                  </button>
                 )}
               </div>
+              <div className="settings-profile">
+                <div className="settings-avatar">{initials}</div>
+                <div className="settings-profile-fields">
+                  {editingProfile ? (
+                    <input
+                      className="settings-input"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Display name"
+                    />
+                  ) : (
+                    <>
+                      <div className="settings-profile-name">{user!.name}</div>
+                      <div className="settings-profile-email">{user!.email}</div>
+                    </>
+                  )}
+                </div>
+              </div>
+              <button
+                className="settings-signout"
+                disabled={signOutBusy}
+                onClick={async () => {
+                  setSignOutBusy(true);
+                  await signOut();
+                  setSignOutBusy(false);
+                }}
+              >
+                <LogOutIcon /> {signOutBusy ? "Signing out…" : "Log out"}
+              </button>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="settings-col-side">
@@ -77,8 +126,10 @@ export function Profile() {
                 <strong>{notes.length}</strong>
               </li>
               <li>
-                <span>Plan</span>
-                <strong>Guest — Local storage</strong>
+                <span>Storage</span>
+                <strong className={isGuest ? "stat-guest" : "stat-synced"}>
+                  {isGuest ? "This device only" : (<><CloudCheckIcon /> Synced</>)}
+                </strong>
               </li>
             </ul>
           </div>

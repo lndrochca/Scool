@@ -3,7 +3,7 @@ import { useAppData } from "../../context/AppDataContext";
 import { parseSyllabus } from "../../data/gradeParser";
 import { computeNodeStats, createEmptyRoot, createTerm, toLetter, updateNode } from "../../data/gradeTree";
 import { GradeExplorer } from "../../components/GradeExplorer";
-import { SparkleIcon, TextPasteIcon, UploadQuickIcon } from "../../components/icons";
+import { TextPasteIcon, UploadQuickIcon, ChevronLeftIcon, GradesEmptyIcon } from "../../components/icons";
 import { SubjectIcon } from "../../components/icons";
 import type { GradeNode } from "../../types";
 import "../shared/page.css";
@@ -51,9 +51,9 @@ export function Grades() {
 
   return (
     <section className="page">
-      <div className="eyebrow">AI Grade Calculator</div>
+      <div className="eyebrow">Grade Calculator</div>
       <h1 className="page-title">Know your grade before finals do</h1>
-      <p className="page-sub">Upload a syllabus or enter grading info — Scool builds an editable, expandable grading folder structure.</p>
+      <p className="page-sub">Upload a syllabus or enter grading info, Scool builds an editable, expandable grading folder structure.</p>
 
       <div className="card grades-composer">
         <div className="grades-composer-row">
@@ -76,13 +76,13 @@ export function Grades() {
               onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
             />
             <button className="btn-ghost" onClick={() => document.getElementById("syllabus-upload")?.click()}>
-              <UploadQuickIcon /> Choose file
+              <UploadQuickIcon /> Choose File / Image
             </button>
             {fileName && <span className="notes-filename">{fileName}</span>}
           </div>
         </div>
         <button className="btn-solid grades-extract-btn" onClick={handleExtract} disabled={extracting}>
-          <SparkleIcon /> {extracting ? "Extracting grading structure…" : "Extract with AI"}
+          {extracting ? "Summarizing info..." : "+ Summarize"}
         </button>
       </div>
 
@@ -115,55 +115,67 @@ export function Grades() {
         </div>
       )}
 
-      <div className="card grades-subjects-panel">
-        <div className="panel-head">
-          <h3>Your Subjects</h3>
-        </div>
-        <ul className="grades-subject-list">
-          {subjects.map((s) => {
-            const root = gradesBySubject[s.id];
-            const stats = root ? computeNodeStats(root) : null;
-            return (
-              <li key={s.id} className={`grades-subject-row ${activeSubjectId === s.id ? "is-active" : ""}`}>
-                <button className="grades-subject-btn" onClick={() => openSubjectCalculator(s.id)}>
-                  <span className={`subject-icon subject-icon--${s.color}`}>
-                    <SubjectIcon name={s.icon} />
-                  </span>
-                  <div className="grades-subject-info">
-                    <div className="subject-name">{s.name}</div>
-                    <div className="note-meta">
-                      {root
-                        ? `${(root.children ?? []).length} ${(root.children ?? []).length === 1 ? "term" : "terms"}`
-                        : "No grade data yet"}
-                    </div>
-                  </div>
-                  <div className="grades-subject-pct">
-                    {stats && stats.percent !== null ? `${stats.percent}% · ${toLetter(stats.percent)}` : "—"}
-                  </div>
-                </button>
-              </li>
-            );
-          })}
-          {subjects.length === 0 && (
-            <li className="notes-empty">No grades available. Create a subject first, then extract or add grading categories here.</li>
-          )}
-        </ul>
-      </div>
-
-      {activeRoot && (
-        <div className="grades-draft">
-          <div className="grades-draft-head">
-            <div>
-              <div className="eyebrow" style={{ marginBottom: 4 }}>Editing</div>
-              <h3 style={{ fontSize: 18, margin: 0 }}>{activeSubject?.name}</h3>
-            </div>
+      <div className={`grades-layout ${activeSubjectId ? "has-active" : ""}`}>
+        <div className="card grades-subjects-panel">
+          <div className="panel-head">
+            <h3>Your Subjects</h3>
           </div>
-          <GradeExplorer
-            root={activeRoot}
-            onChange={(next) => activeSubjectId && setGradeTree(activeSubjectId, next)}
-          />
+          <ul className="grades-subject-list">
+            {subjects.map((s) => {
+              const root = gradesBySubject[s.id];
+              const stats = root ? computeNodeStats(root) : null;
+              return (
+                <li key={s.id} className={`grades-subject-row ${activeSubjectId === s.id ? "is-active" : ""}`}>
+                  <button className="grades-subject-btn" onClick={() => openSubjectCalculator(s.id)}>
+                    <span className={`subject-icon subject-icon--${s.color}`}>
+                      <SubjectIcon name={s.icon} />
+                    </span>
+                    <div className="grades-subject-info">
+                      <div className="subject-name">{s.name}</div>
+                      <div className="note-meta">
+                        {root
+                          ? `${(root.children ?? []).length} ${(root.children ?? []).length === 1 ? "term" : "terms"}`
+                          : "No grade data yet"}
+                      </div>
+                    </div>
+                    <div className="grades-subject-pct">
+                      {stats && stats.percent !== null ? `${stats.percent}% · ${toLetter(stats.percent)}` : "—"}
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
+            {subjects.length === 0 && (
+              <li className="notes-empty">No grades available. Create a subject first, then extract or add grading categories here.</li>
+            )}
+          </ul>
         </div>
-      )}
+
+        <div className="grades-detail-pane">
+          {activeRoot ? (
+            <div className="grades-draft grades-detail-inner">
+              <div className="grades-draft-head">
+                <div className="grades-detail-heading">
+                  <button className="grades-back-btn" onClick={() => setActiveSubjectId(null)}>
+                    <ChevronLeftIcon /> All subjects
+                  </button>
+                  <h3 style={{ fontSize: 18, margin: "10px 0 0" }}>{activeSubject?.name}</h3>
+                </div>
+              </div>
+              <GradeExplorer
+                root={activeRoot}
+                onChange={(next) => activeSubjectId && setGradeTree(activeSubjectId, next)}
+              />
+            </div>
+          ) : (
+            <div className="card grades-detail-empty">
+              <GradesEmptyIcon />
+              <h3>Select a subject</h3>
+              <p>Choose a subject from the list to view or edit its grading breakdown.</p>
+            </div>
+          )}
+        </div>
+      </div>
     </section>
   );
 }

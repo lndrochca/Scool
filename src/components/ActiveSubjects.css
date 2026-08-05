@@ -13,7 +13,7 @@
   border-bottom: none;
 }
 .subject-row:hover {
-  background: #F5F5F7;
+  background: var(--chip-bg);
   border-radius: 10px;
   cursor: pointer;
 }

@@ -21,7 +21,7 @@
   font-weight: 600;
 }
 .notes-mode-tab svg { width: 14px; height: 14px; }
-.notes-mode-tab.is-active { background: var(--black); color: #F5F5F7; border-color: var(--black); }
+.notes-mode-tab.is-active { background: var(--accent); color: var(--accent-contrast); border-color: var(--accent); }
 .notes-mode-tab:hover:not(.is-active) { background: var(--chip-bg); }
 
 .notes-input-area { margin-bottom: 16px; }

@@ -38,8 +38,8 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: var(--black);
-  color: #F5F5F7;
+  background: var(--accent);
+  color: var(--accent-contrast);
   border: none;
   border-radius: 100px;
   padding: 0 18px;
@@ -91,7 +91,7 @@
   justify-content: center;
 }
 .lib-swatch svg { width: 15px; height: 15px; }
-.lib-swatch.is-active { background: var(--chip-bg); color: var(--text); border-color: var(--text-faint); }
+.lib-swatch.is-active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border); }
 
 .lib-color-dot {
   width: 22px;
@@ -105,7 +105,18 @@
 .lib-color-dot--tan { background: var(--tan); }
 .lib-color-dot--red { background: var(--red); }
 .lib-color-dot--amber { background: var(--amber); }
-.lib-color-dot.is-active { border-color: var(--black); }
+.lib-color-dot.is-active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-ring); }
+
+.lib-semester-select {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-soft);
+  font-family: inherit;
+}
 
 .lib-add-actions {
   margin-left: auto;

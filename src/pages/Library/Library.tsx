@@ -3,6 +3,7 @@ import { useAppData } from "../../context/AppDataContext";
 import { SubjectIcon } from "../../components/icons";
 import { PinIcon, PlusIcon, SearchIcon, DotsIcon, PencilIcon, TrashIcon, CheckIcon, XIcon } from "../../components/icons";
 import type { AccentColor, IconName } from "../../types";
+import { SEMESTER_OPTIONS } from "../../types";
 import "../shared/page.css";
 import "./Library.css";
 
@@ -29,6 +30,7 @@ export function Library({ onOpenSubject, autoOpenAdd, onAutoOpenConsumed }: Prop
   const [newCode, setNewCode] = useState("");
   const [newIcon, setNewIcon] = useState<IconName>("biology");
   const [newColor, setNewColor] = useState<AccentColor>("green");
+  const [newSemester, setNewSemester] = useState<string>("");
 
   useEffect(() => {
     if (autoOpenAdd) {
@@ -56,11 +58,12 @@ export function Library({ onOpenSubject, autoOpenAdd, onAutoOpenConsumed }: Prop
   const handleAdd = () => {
     if (!newName.trim()) return;
     const code = newCode.trim() || newName.trim().slice(0, 3).toUpperCase() + " 101";
-    addSubject({ name: newName.trim(), code, icon: newIcon, color: newColor });
+    addSubject({ name: newName.trim(), code, icon: newIcon, color: newColor, semester: newSemester || undefined });
     setNewName("");
     setNewCode("");
     setNewIcon("biology");
     setNewColor("green");
+    setNewSemester("");
     setShowAdd(false);
   };
 
@@ -140,6 +143,17 @@ export function Library({ onOpenSubject, autoOpenAdd, onAutoOpenConsumed }: Prop
                 />
               ))}
             </div>
+            <select
+              className="lib-semester-select"
+              value={newSemester}
+              onChange={(e) => setNewSemester(e.target.value)}
+              aria-label="Assign to semester"
+            >
+              <option value="">Unassigned</option>
+              {SEMESTER_OPTIONS.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
             <div className="lib-add-actions">
               <button className="btn-ghost" onClick={() => setShowAdd(false)}>Cancel</button>
               <button className="btn-solid" onClick={handleAdd}>Create Subject</button>

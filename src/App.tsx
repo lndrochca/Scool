@@ -10,13 +10,20 @@ import { SubjectWorkspace } from "./pages/SubjectWorkspace/SubjectWorkspace";
 import { Profile } from "./pages/Profile/Profile";
 import { Settings } from "./pages/Settings/Settings";
 import { AppDataProvider, useAppData } from "./context/AppDataContext";
+import { NotificationsProvider } from "./context/NotificationsContext";
+import { AuthModal } from "./components/AuthModal";
+import { GuestPromptModal } from "./components/GuestPromptModal";
 import type { PageName, WorkspaceTabTarget, Note } from "./types";
 import type { QuickActionKind } from "./components/QuickActions";
 
 export default function App() {
   return (
     <AppDataProvider>
-      <AppShell />
+      <NotificationsProvider>
+        <AppShell />
+        <AuthModal />
+        <GuestPromptModal />
+      </NotificationsProvider>
     </AppDataProvider>
   );
 }

@@ -91,7 +91,7 @@ export function Notes({
     <section className="page">
       <div className="eyebrow">Notes Workspace</div>
       <h1 className="page-title">Your notebooks</h1>
-      <p className="page-sub">Every subject has its own notebook, organized automatically from your AI-generated notes.</p>
+      <p className="page-sub">Every subject has its own notebook, organized automatically from your generated notes.</p>
 
       <div className="notebook-toolbar">
         <div className="notebook-search notebook-search--wide">

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
 import { generateFlashcards } from "../../data/flashcardGenerator";
-import { SubjectIcon, SparkleIcon, ShuffleIcon, TrashIcon, XIcon, CheckIcon, BackIcon, PlusIcon, PencilIcon } from "../../components/icons";
+import { SubjectIcon, PencilIcon, TrashIcon, PlusIcon, BackIcon, ShuffleIcon, XIcon, CheckIcon } from "../../components/icons";
 import type { Flashcard, FlashcardSet } from "../../types";
 import "../shared/page.css";
 import "../../components/RecentNotes.css";
@@ -76,12 +76,12 @@ export function Flashcards({ initialSetId, onInitialConsumed }: Props = {}) {
 
   return (
     <section className="page">
-      <div className="eyebrow">AI Flashcards</div>
+      <div className="eyebrow">Flashcards</div>
       <h1 className="page-title">Quiz yourself before it counts</h1>
-      <p className="page-sub">Generate a flashcard set from a subject or topic, then run through it as a quick self-quiz. You can also turn any AI note into a flashcard set right from the Notes workspace.</p>
+      <p className="page-sub">Generate a flashcard set from a subject or topic, then run through it as a quick self-quiz. You can also turn any notes into a flashcard set right from the Notes workspace.</p>
 
       <div className="card fc-composer">
-        <label className="fc-label"><SparkleIcon /> Generate from a subject or topic</label>
+        <label className="fc-label">Generate from a subject or topic</label>
         <div className="fc-composer-row">
           <input
             className="notes-text-input"
@@ -91,7 +91,7 @@ export function Flashcards({ initialSetId, onInitialConsumed }: Props = {}) {
             onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
           />
           <button className="btn-solid" onClick={handleGenerate} disabled={generating}>
-            <SparkleIcon /> {generating ? "Generating…" : "Generate Set"}
+            {generating ? "Generating…" : "+ Generate Set"}
           </button>
         </div>
       </div>

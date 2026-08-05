@@ -1,16 +1,34 @@
 import { useMemo, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
 import { SubjectIcon } from "../../components/icons";
-import { PinIcon } from "../../components/icons";
+import { PinIcon, FolderMoveIcon } from "../../components/icons";
+import { SEMESTER_OPTIONS } from "../../types";
 import "../shared/page.css";
 import "./Bookshelf.css";
 
 type GroupBy = "none" | "semester" | "category";
 
+/** Fixed display order for known semester/category labels; anything else falls back to alphabetical, with "Unassigned" always last. */
+const KNOWN_ORDER = [...SEMESTER_OPTIONS];
+
+function sortGroupLabels(labels: string[]): string[] {
+  return [...labels].sort((a, b) => {
+    if (a === "Unassigned" || a === "Uncategorized") return 1;
+    if (b === "Unassigned" || b === "Uncategorized") return -1;
+    const ai = KNOWN_ORDER.indexOf(a as (typeof KNOWN_ORDER)[number]);
+    const bi = KNOWN_ORDER.indexOf(b as (typeof KNOWN_ORDER)[number]);
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+    return a.localeCompare(b);
+  });
+}
+
 export function Bookshelf({ onOpenSubject }: { onOpenSubject: (id: string) => void }) {
-  const { subjects, togglePin } = useAppData();
+  const { subjects, togglePin, updateSubject } = useAppData();
   const [groupBy, setGroupBy] = useState<GroupBy>("semester");
   const [order, setOrder] = useState<string[]>(subjects.map((s) => s.id));
+  const [moveMenuId, setMoveMenuId] = useState<string | null>(null);
 
   const orderedIds = useMemo(() => {
     const existing = new Set(subjects.map((s) => s.id));
@@ -31,7 +49,8 @@ export function Bookshelf({ onOpenSubject }: { onOpenSubject: (id: string) => vo
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(s);
     }
-    return Array.from(map.entries()).map(([label, items]) => ({ label, items }));
+    const labels = sortGroupLabels(Array.from(map.keys()));
+    return labels.map((label) => ({ label, items: map.get(label)! }));
   }, [ordered, groupBy]);
 
   const move = (id: string, dir: -1 | 1) => {
@@ -43,6 +62,11 @@ export function Bookshelf({ onOpenSubject }: { onOpenSubject: (id: string) => vo
       [list[idx], list[swapWith]] = [list[swapWith], list[idx]];
       return list;
     });
+  };
+
+  const assignSemester = (id: string, semester: string) => {
+    updateSubject(id, { semester: semester || undefined });
+    setMoveMenuId(null);
   };
 
   return (
@@ -72,7 +96,10 @@ export function Bookshelf({ onOpenSubject }: { onOpenSubject: (id: string) => vo
 
       {groups.map((group) => (
         <div className="shelf-group" key={group.label}>
-          <h3 className="shelf-group-title">{group.label}</h3>
+          <div className="shelf-group-head">
+            <h3 className="shelf-group-title">{group.label}</h3>
+            <span className="shelf-group-count">{group.items.length} {group.items.length === 1 ? "subject" : "subjects"}</span>
+          </div>
           <div className="shelf">
             <div className="shelf-row">
               {group.items.map((s, i) => (
@@ -93,9 +120,32 @@ export function Bookshelf({ onOpenSubject }: { onOpenSubject: (id: string) => vo
                       <span>{s.gradePercent > 0 ? `${s.gradePercent}%` : "—"}</span>
                     </div>
                   </button>
-                  <div className="book-reorder">
-                    <button disabled={i === 0} onClick={() => move(s.id, -1)}>‹</button>
-                    <button disabled={i === group.items.length - 1} onClick={() => move(s.id, 1)}>›</button>
+                  <div className="book-controls">
+                    <div className="book-move-wrap">
+                      <button
+                        className="book-move-btn"
+                        onClick={(e) => { e.stopPropagation(); setMoveMenuId(moveMenuId === s.id ? null : s.id); }}
+                        aria-label="Move to section"
+                        title="Move to section"
+                      >
+                        <FolderMoveIcon />
+                      </button>
+                      {moveMenuId === s.id && (
+                        <div className="book-move-menu card">
+                          <div className="book-move-menu-label">Move to…</div>
+                          <button onClick={() => assignSemester(s.id, "")}>Unassigned</button>
+                          {SEMESTER_OPTIONS.map((opt) => (
+                            <button key={opt} onClick={() => assignSemester(s.id, opt)} className={s.semester === opt ? "is-current" : ""}>
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="book-reorder">
+                      <button disabled={i === 0} onClick={() => move(s.id, -1)}>‹</button>
+                      <button disabled={i === group.items.length - 1} onClick={() => move(s.id, 1)}>›</button>
+                    </div>
                   </div>
                 </div>
               ))}

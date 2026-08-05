@@ -36,7 +36,7 @@
   padding: 4px;
   border-radius: 8px;
 }
-.note-editor-bullet-row:hover { background: #F5F5F7; }
+.note-editor-bullet-row:hover { background: var(--chip-bg); }
 .note-editor-dot {
   width: 5px;
   height: 5px;

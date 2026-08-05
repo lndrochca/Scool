@@ -29,7 +29,7 @@ const TABS: { key: WorkspaceTabTarget; label: string }[] = [
   { key: "files", label: "Files" },
   { key: "assignments", label: "Assignments" },
   { key: "grades", label: "Grade Calculator" },
-  { key: "assistant", label: "AI Study Assistant" },
+  { key: "assistant", label: "Study Buddy" },
   { key: "resources", label: "Resources" },
 ];
 

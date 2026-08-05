@@ -79,7 +79,7 @@
   transition: transform 0.15s ease;
 }
 .switch.is-on {
-  background: var(--green);
+  background: var(--accent);
 }
 .switch.is-on .switch-knob {
   transform: translateX(16px);

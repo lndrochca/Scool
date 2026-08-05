@@ -27,3 +27,13 @@
   font-size: 14px;
   margin: 0 0 28px 0;
 }
+
+@media (max-width: 720px) {
+  .page { padding: 24px 18px 50px 18px; }
+  .page-title { font-size: 24px; }
+  .page-sub { font-size: 13px; margin-bottom: 22px; }
+}
+@media (max-width: 420px) {
+  .page { padding: 18px 14px 42px 14px; }
+  .page-title { font-size: 21px; }
+}

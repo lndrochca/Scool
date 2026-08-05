@@ -1,5 +1,15 @@
 export type AccentColor = "green" | "orange" | "tan" | "red" | "amber";
 
+/** Preset options for organizing subjects on the Bookshelf. Free text is still allowed. */
+export const SEMESTER_OPTIONS = [
+  "1st Semester",
+  "2nd Semester",
+  "Summer",
+  "Review Materials",
+  "Reference Books",
+  "Archived",
+] as const;
+
 export type IconName = "biology" | "calculus" | "history" | "physics" | "english";
 
 export interface Subject {
@@ -140,3 +150,38 @@ export type PageName =
   | "profile"
   | "settings"
   | "subject";
+
+/* ---------------------------------------------------------------------- */
+/* Auth & account                                                          */
+/* ---------------------------------------------------------------------- */
+
+export interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: number;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Appearance / theme                                                      */
+/* ---------------------------------------------------------------------- */
+
+export type ThemeMode = "light" | "dark" | "system";
+
+/* ---------------------------------------------------------------------- */
+/* Notifications                                                           */
+/* ---------------------------------------------------------------------- */
+
+export type NotificationType = "deadline" | "overdue" | "grade" | "system";
+
+export interface NotificationItem {
+  id: string;
+  /** Stable key used to dedupe auto-generated notifications (e.g. one per assignment+urgency). */
+  dedupeKey: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  timestamp: number;
+  read: boolean;
+  subjectId?: string;
+}

@@ -51,7 +51,8 @@
   border-bottom: 1px solid var(--border-soft);
 }
 .grades-subject-row:last-child { border-bottom: none; }
-.grades-subject-row.is-active { background: #F5F5F7; border-radius: 10px; }
+.grades-subject-row.is-active { background: var(--accent-soft); border-radius: 10px; }
+.grades-subject-row.is-active .subject-name { color: var(--accent); }
 .grades-subject-btn {
   width: 100%;
   display: flex;
@@ -61,8 +62,10 @@
   background: transparent;
   border: none;
   text-align: left;
+  transition: background 0.15s ease;
 }
-.grades-subject-btn:hover { background: #F5F5F7; border-radius: 10px; }
+.grades-subject-btn:hover { background: var(--chip-bg); border-radius: 10px; }
+.grades-subject-row.is-active .grades-subject-btn:hover { background: var(--accent-soft); }
 .grades-subject-info { flex: 1; min-width: 0; }
 .grades-subject-pct {
   font-family: ui-monospace, monospace;
@@ -70,4 +73,57 @@
   font-weight: 600;
   color: var(--text-soft);
   white-space: nowrap;
+}
+
+/* Split view: subject list + detail pane */
+.grades-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.grades-layout .grades-subjects-panel { margin-bottom: 0; position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; }
+.grades-detail-pane { min-width: 0; }
+.grades-detail-inner { margin-bottom: 0; }
+
+.grades-back-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 8px 13px;
+  border-radius: 100px;
+  margin-bottom: 4px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.grades-back-btn svg { width: 14px; height: 14px; }
+.grades-back-btn:hover { background: var(--chip-bg); color: var(--text); }
+
+.grades-detail-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 64px 32px;
+  color: var(--text-faint);
+  min-height: 260px;
+}
+.grades-detail-empty svg { width: 38px; height: 38px; margin-bottom: 14px; opacity: 0.6; }
+.grades-detail-empty h3 { font-size: 15px; color: var(--text-soft); margin-bottom: 6px; }
+.grades-detail-empty p { font-size: 13px; max-width: 280px; margin: 0; }
+
+@media (max-width: 960px) {
+  .grades-layout {
+    grid-template-columns: 1fr;
+  }
+  .grades-layout .grades-subjects-panel { position: static; max-height: none; margin-bottom: 24px; }
+  .grades-back-btn { display: inline-flex; }
+  .grades-detail-empty { display: none; }
+  /* On mobile, once a subject is active, collapse the list to keep focus on the detail pane */
+  .grades-layout.has-active .grades-subjects-panel { display: none; }
 }

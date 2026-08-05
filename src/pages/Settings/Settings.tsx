@@ -1,5 +1,8 @@
-import { useState } from "react";
-import { CheckIcon } from "../../components/icons";
+import { useEffect, useState } from "react";
+import { CheckIcon, CloudCheckIcon, DeviceIcon, LaptopIcon, LogOutIcon, MoonIcon, SunIcon } from "../../components/icons";
+import { useAuth } from "../../context/AuthContext";
+import { useTheme, isValidHex } from "../../context/ThemeContext";
+import { useAppData } from "../../context/AppDataContext";
 import "../shared/page.css";
 import "../shared/settings-common.css";
 import "../../components/RecentNotes.css";
@@ -32,16 +35,29 @@ function ToggleRow({ label, description, value, onChange }: ToggleRowProps) {
   );
 }
 
-const ACCENTS: { key: "green" | "orange" | "tan" | "red" | "amber"; label: string }[] = [
-  { key: "green", label: "Sage" },
-  { key: "orange", label: "Clay" },
-  { key: "tan", label: "Tan" },
-  { key: "amber", label: "Amber" },
-  { key: "red", label: "Brick" },
-];
+const ACCENT_PRESETS = ["#3B82F6", "#6366F1", "#10B981", "#F97316", "#EC4899", "#111113"];
+
+function downloadJSON(filename: string, data: unknown) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 export function Settings() {
-  const [accent, setAccent] = useState<"green" | "orange" | "tan" | "red" | "amber">("green");
+  const { mode, setMode, accent, setAccent } = useTheme();
+  const { user, isGuest, openAuthModal, signOut } = useAuth();
+  const appData = useAppData();
+
+  const [hexDraft, setHexDraft] = useState(accent);
+  const [hexError, setHexError] = useState(false);
+
+  useEffect(() => setHexDraft(accent), [accent]);
 
   const [emailReminders, setEmailReminders] = useState(true);
   const [deadlineAlerts, setDeadlineAlerts] = useState(true);
@@ -50,7 +66,38 @@ export function Settings() {
 
   const [compactCards, setCompactCards] = useState(false);
   const [autoSaveNotes, setAutoSaveNotes] = useState(true);
-  const [signInMessage, setSignInMessage] = useState<string | null>(null);
+  const [signOutBusy, setSignOutBusy] = useState(false);
+  const [cleared, setCleared] = useState(false);
+
+  const commitHex = (value: string) => {
+    setHexDraft(value);
+    if (isValidHex(value)) {
+      setHexError(false);
+      setAccent(value);
+    } else {
+      setHexError(true);
+    }
+  };
+
+  const handleExport = () => {
+    downloadJSON(`scool-export-${new Date().toISOString().slice(0, 10)}.json`, {
+      exportedAt: new Date().toISOString(),
+      account: user ? { name: user.name, email: user.email } : "guest",
+      subjects: appData.subjects,
+      notes: appData.notes,
+      gradesBySubject: appData.gradesBySubject,
+      filesBySubject: appData.filesBySubject,
+      assignmentsBySubject: appData.assignmentsBySubject,
+      resourcesBySubject: appData.resourcesBySubject,
+      flashcardSets: appData.flashcardSets,
+    });
+  };
+
+  const handleClearLocal = () => {
+    if (!window.confirm("This removes everything stored on this device. This can't be undone. Continue?")) return;
+    appData.clearAllData();
+    setCleared(true);
+  };
 
   return (
     <section className="page settings-page">
@@ -89,6 +136,12 @@ export function Settings() {
               value={aiSuggestions}
               onChange={setAiSuggestions}
             />
+            {isGuest && (
+              <p className="settings-inline-note">
+                Notification preferences need an account to actually deliver anything —{" "}
+                <button className="settings-inline-link" onClick={() => openAuthModal("sign-up", "settings")}>sign in</button> to turn these on.
+              </p>
+            )}
           </div>
 
           {/* Appearance */}
@@ -96,24 +149,66 @@ export function Settings() {
             <div className="panel-head">
               <h3>Appearance</h3>
             </div>
-            <div className="settings-row">
+
+            <div className="settings-row settings-row--theme">
               <div className="settings-row-text">
-                <div className="settings-row-label">Accent color</div>
-                <div className="settings-row-desc">Applied to highlights across the app</div>
+                <div className="settings-row-label">Theme</div>
+                <div className="settings-row-desc">Choose a light or dark interface, or match your system</div>
               </div>
-              <div className="settings-swatches">
-                {ACCENTS.map((a) => (
-                  <button
-                    key={a.key}
-                    className={`settings-swatch settings-swatch--${a.key} ${accent === a.key ? "is-active" : ""}`}
-                    aria-label={a.label}
-                    onClick={() => setAccent(a.key)}
-                  >
-                    {accent === a.key && <CheckIcon />}
-                  </button>
-                ))}
+              <div className="theme-segmented">
+                <button className={`theme-segment ${mode === "light" ? "is-active" : ""}`} onClick={() => setMode("light")}>
+                  <SunIcon /> Light
+                </button>
+                <button className={`theme-segment ${mode === "dark" ? "is-active" : ""}`} onClick={() => setMode("dark")}>
+                  <MoonIcon /> Dark
+                </button>
+                <button className={`theme-segment ${mode === "system" ? "is-active" : ""}`} onClick={() => setMode("system")}>
+                  <LaptopIcon /> System
+                </button>
               </div>
             </div>
+
+            <div className="settings-row settings-row--accent">
+              <div className="settings-row-text">
+                <div className="settings-row-label">Accent color</div>
+                <div className="settings-row-desc">Applied to buttons, links, progress bars, and highlights across the app</div>
+              </div>
+              <div className="accent-picker">
+                <div className="accent-picker-presets">
+                  {ACCENT_PRESETS.map((hex) => (
+                    <button
+                      key={hex}
+                      className={`accent-swatch ${accent.toLowerCase() === hex.toLowerCase() ? "is-active" : ""}`}
+                      style={{ background: hex }}
+                      aria-label={hex}
+                      onClick={() => commitHex(hex)}
+                    >
+                      {accent.toLowerCase() === hex.toLowerCase() && <CheckIcon />}
+                    </button>
+                  ))}
+                </div>
+                <div className={`accent-hex-field ${hexError ? "has-error" : ""}`}>
+                  <input
+                    type="color"
+                    className="accent-color-input"
+                    value={isValidHex(hexDraft) ? hexDraft : accent}
+                    onChange={(e) => commitHex(e.target.value)}
+                    aria-label="Pick accent color"
+                  />
+                  <input
+                    type="text"
+                    className="accent-hex-input"
+                    value={hexDraft}
+                    onChange={(e) => commitHex(e.target.value)}
+                    spellCheck={false}
+                    maxLength={7}
+                    placeholder="#3B82F6"
+                  />
+                </div>
+              </div>
+            </div>
+            {hexError && <p className="accent-hex-error">Enter a valid hex color, like #3B82F6.</p>}
+
             <ToggleRow
               label="Compact cards"
               description="Show more content with tighter spacing"
@@ -136,23 +231,47 @@ export function Settings() {
             </div>
             <div className="settings-row" style={{ padding: "0 16px 12px" }}>
               <div className="settings-row-text">
-                <div className="settings-row-label">Account Status</div>
-                <div className="settings-row-desc" style={{ fontWeight: 600, color: "var(--text)" }}>Guest</div>
-                <div className="settings-row-desc">
-                  You are currently using the application as a guest. Your data is stored locally until you sign in.
+                <div className={`settings-status-pill ${isGuest ? "is-guest" : "is-active"}`}>
+                  {isGuest ? "Guest Mode" : <><CloudCheckIcon /> Signed in</>}
                 </div>
+                {isGuest ? (
+                  <div className="settings-row-desc" style={{ marginTop: 8 }}>
+                    You're exploring Scool as a guest. Everything you create is saved on this device only — sign in to keep it
+                    permanently and sync it across your devices.
+                  </div>
+                ) : (
+                  <div className="settings-row-desc" style={{ marginTop: 8 }}>
+                    Signed in as <strong style={{ color: "var(--text)" }}>{user!.name}</strong> ({user!.email}). Your data syncs to
+                    this account automatically.
+                  </div>
+                )}
               </div>
             </div>
             <div className="settings-actions">
-              <button
-                className="settings-action settings-action--primary"
-                onClick={() => setSignInMessage("Sign in is coming soon — for now, everything you create stays saved locally as a guest.")}
-              >
-                Sign In / Create Account
+              {isGuest ? (
+                <button className="settings-action settings-action--primary" onClick={() => openAuthModal("sign-up", "settings")}>
+                  Sign In / Create Account
+                </button>
+              ) : (
+                <button
+                  className="settings-action"
+                  disabled={signOutBusy}
+                  onClick={async () => {
+                    setSignOutBusy(true);
+                    await signOut();
+                    setSignOutBusy(false);
+                  }}
+                >
+                  <LogOutIcon /> {signOutBusy ? "Signing out…" : "Log out"}
+                </button>
+              )}
+              <button className="settings-action" onClick={handleExport}>
+                <DeviceIcon /> Export my data
               </button>
-              {signInMessage && <p className="settings-row-desc" style={{ padding: "0 4px" }}>{signInMessage}</p>}
-              <button className="settings-action">Export my data</button>
-              <button className="settings-action settings-action--danger">Clear local data</button>
+              <button className="settings-action settings-action--danger" onClick={handleClearLocal}>
+                Clear local data
+              </button>
+              {cleared && <p className="settings-row-desc" style={{ padding: "0 4px" }}>Local data cleared.</p>}
             </div>
           </div>
         </div>
