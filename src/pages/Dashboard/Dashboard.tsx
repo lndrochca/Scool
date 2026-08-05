@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { QuickActions, type QuickActionKind } from "../../components/QuickActions";
-import { RecentNotes } from "../../components/RecentNotes";
-import { ActiveSubjects } from "../../components/ActiveSubjects";
-import { UpcomingPanel } from "../../components/UpcomingPanel";
-import { GradesPanel } from "../../components/GradesPanel";
+import { QuickActions, type QuickActionKind } from "../../components/dashboard/QuickActions";
+import { RecentNotes } from "../../components/dashboard/RecentNotes";
+import { ActiveSubjects } from "../../components/dashboard/ActiveSubjects";
+import { UpcomingPanel } from "../../components/dashboard/UpcomingPanel";
+import { GradesPanel } from "../../components/dashboard/GradesPanel";
 import { useAppData } from "../../context/AppDataContext";
 import { formatDue } from "../../utils/time";
 import type { Note, PageName, UpcomingItem, WorkspaceTabTarget } from "../../types";

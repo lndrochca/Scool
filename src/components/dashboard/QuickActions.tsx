@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { GradesQuickIcon, NotesQuickIcon, SubjectQuickIcon, UploadQuickIcon } from "./icons";
+import { GradesQuickIcon, NotesQuickIcon, SubjectQuickIcon, UploadQuickIcon } from "../ui/icons";
 import "./QuickActions.css";
 
 export type QuickActionKind = "new-notes" | "add-grades" | "new-subject" | "upload-file";

@@ -80,9 +80,9 @@ function loadDataForAccount(accountKey: string): PersistedAppData {
 }
 
 interface AppDataValue extends PersistedAppData {
-  addSubject: (input: { name: string; code: string; icon: IconName; color: Subject["color"]; category?: string; semester?: string }) => string;
+  addSubject: (input: { name: string; code: string; icon: IconName; color: Subject["color"]; customColor?: string; category?: string; semester?: string }) => string;
   renameSubject: (id: string, name: string) => void;
-  updateSubject: (id: string, patch: Partial<Pick<Subject, "name" | "description" | "category" | "semester">>) => void;
+  updateSubject: (id: string, patch: Partial<Pick<Subject, "name" | "description" | "category" | "semester" | "icon" | "color" | "customColor">>) => void;
   deleteSubject: (id: string) => void;
   togglePin: (id: string) => void;
 
@@ -221,18 +221,18 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
   const actions = useMemo(
     () => ({
-      addSubject: ({ name, code, icon, color, category, semester }: { name: string; code: string; icon: IconName; color: Subject["color"]; category?: string; semester?: string }) => {
+      addSubject: ({ name, code, icon, color, customColor, category, semester }: { name: string; code: string; icon: IconName; color: Subject["color"]; customColor?: string; category?: string; semester?: string }) => {
         const id = makeId("subj");
         setSubjects((prev) => [
           ...prev,
-          { id, name, code, icon, color, notesCount: 0, gradePercent: 0, letterGrade: "—", category, semester },
+          { id, name, code, icon, color, customColor, notesCount: 0, gradePercent: 0, letterGrade: "—", category, semester },
         ]);
         return id;
       },
       renameSubject: (id: string, name: string) => {
         setSubjects((prev) => prev.map((s) => (s.id === id ? { ...s, name } : s)));
       },
-      updateSubject: (id: string, patch: Partial<Pick<Subject, "name" | "description" | "category" | "semester">>) => {
+      updateSubject: (id: string, patch: Partial<Pick<Subject, "name" | "description" | "category" | "semester" | "icon" | "color" | "customColor">>) => {
         setSubjects((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
       },
       deleteSubject: (id: string) => {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TopNav } from "./components/TopNav";
+import { TopNav } from "./components/nav/TopNav";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
 import { Notes } from "./pages/Notes/Notes";
 import { Grades } from "./pages/Grades/Grades";
@@ -11,10 +11,10 @@ import { Profile } from "./pages/Profile/Profile";
 import { Settings } from "./pages/Settings/Settings";
 import { AppDataProvider, useAppData } from "./context/AppDataContext";
 import { NotificationsProvider } from "./context/NotificationsContext";
-import { AuthModal } from "./components/AuthModal";
-import { GuestPromptModal } from "./components/GuestPromptModal";
+import { AuthModal } from "./components/modals/AuthModal";
+import { GuestPromptModal } from "./components/modals/GuestPromptModal";
 import type { PageName, WorkspaceTabTarget, Note } from "./types";
-import type { QuickActionKind } from "./components/QuickActions";
+import type { QuickActionKind } from "./components/dashboard/QuickActions";
 
 export default function App() {
   return (

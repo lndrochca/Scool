@@ -1,5 +1,5 @@
-import type { NoteSection } from "../types";
-import { PlusIcon, TrashIcon } from "./icons";
+import type { NoteSection } from "../../types";
+import { PlusIcon, TrashIcon } from "../ui/icons";
 import "./NoteEditor.css";
 
 let uid = 0;

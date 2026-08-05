@@ -1,6 +1,6 @@
-import type { Note } from "../types";
-import { SubjectIcon } from "./icons";
-import { formatTimeAgo } from "../utils/time";
+import type { Note } from "../../types";
+import { SubjectIcon } from "../ui/icons";
+import { formatTimeAgo } from "../../utils/time";
 import "./RecentNotes.css";
 
 interface Props {

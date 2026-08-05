@@ -25,7 +25,9 @@
   font-size: 13.5px;
   font-family: ui-monospace, monospace;
   color: var(--text);
+  background: var(--bg);
   resize: vertical;
+  width: 100%;
 }
 .grades-input-col textarea:focus { outline: none; border-color: var(--text-faint); }
 .grades-input-col--upload { justify-content: flex-start; }

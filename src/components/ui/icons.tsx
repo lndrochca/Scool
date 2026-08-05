@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import type { IconName } from "../types";
+import type { IconName } from "../../types";
 
 type IconProps = { className?: string };
 
@@ -47,12 +47,221 @@ export function EnglishIcon({ className }: IconProps) {
   );
 }
 
+export function MathIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M5 4h13M5 20l13-16M5 20h13" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function ChemistryIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M9 2h6M10 2v6.5L4.5 18a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3L14 8.5V2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7.5 15h9" />
+    </svg>
+  );
+}
+
+export function ComputerScienceIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M9 8 5 12l4 4M15 8l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function ArtIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M12 2C6.5 2 2 6 2 11c0 3 2 4.5 4 4.5.9 0 1.5-.6 1.5-1.4 0-.7-.5-1-.5-1.8 0-1.4 1.3-2.3 2.8-2.3H14c3.3 0 6-2 6-5C20 3.3 16.6 2 12 2Z" />
+      <circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none" />
+      <circle cx="11" cy="6.5" r="1" fill="currentColor" stroke="none" />
+      <circle cx="15.5" cy="7" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function MusicIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M9 18V5l11-2v13" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="17" cy="16" r="3" />
+    </svg>
+  );
+}
+
+export function LanguageIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3a13 13 0 0 1 0 18 13 13 0 0 1 0-18Z" />
+    </svg>
+  );
+}
+
+export function GeographyIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M3 6.5 9 4l6 2.5 6-2.5v13L15 19.5 9 17l-6 2.5Z" strokeLinejoin="round" />
+      <path d="M9 4v13M15 6.5v13" />
+    </svg>
+  );
+}
+
+export function EconomicsIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M3 17 9 9l4 4 8-9" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 4h5v5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function PsychologyIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M9 3c-2.5 0-4 2-4 4 0 1-.5 1.5-1 2s-1 1.5-1 2.5c0 1.6 1.2 2.5 1.2 2.5S4 15.5 4 17c0 2 1.5 3 3 3 .8 0 1.3-.3 1.7-.6" strokeLinecap="round" />
+      <path d="M9 3c1.2 0 2 .8 2 2v13.5c0 1-.8 1.5-1.6 1.5" strokeLinecap="round" />
+      <path d="M13 6c1-2 3-3 4.5-2s1.8 2.8 1 4c1 .5 1.5 1.5 1.5 2.5S19.3 12.7 19 13c1 .8 1 2.2.3 3.1-.6.8-1.6 1-2.3.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function PeIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M4 8v8M20 8v8M2 12h4M18 12h4M6 12h12" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function LawIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M12 3v18M8 21h8" strokeLinecap="round" />
+      <path d="M12 6 4 9l3 6a4 4 0 0 0 3-6M12 6l8 3-3 6a4 4 0 0 1-3-6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function MedicineIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M12 8v8M8 12h8" strokeLinecap="round" />
+      <rect x="4" y="4" width="16" height="16" rx="4" />
+    </svg>
+  );
+}
+
+export function PhilosophyIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M20 4 8 16M20 4c0 4-2 7-5 8.5M20 4c-4 0-7 2-8.5 5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 20l4-4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function BusinessIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <rect x="3" y="8" width="18" height="12" rx="2" />
+      <path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function AstronomyIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M12 3a7 7 0 1 0 8.5 8.7A9 9 0 0 1 12 3Z" strokeLinejoin="round" />
+      <path d="M18 3v3M16.5 4.5h3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function StatisticsIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function EngineeringIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 3v2.2M12 18.8V21M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M3 12h2.2M18.8 12H21M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function LiteratureIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M12 6c-2-1.5-4.5-2-8-1.5v13c3.5-.5 6 0 8 1.5 2-1.5 4.5-2 8-1.5v-13c-3.5-.5-6 0-8 1.5Z" strokeLinejoin="round" />
+      <path d="M12 6v13" />
+    </svg>
+  );
+}
+
+export function GeologyIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M3 19 9 8l4 6 2-3 6 8Z" strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function TheaterIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M4 5c0 3 2 4 2 6.5S4 16 4 16c3.5 1 6-1 6-4.5 0-2-1-3-1-5.5 0 0-2.5-1-5-1Z" strokeLinejoin="round" />
+      <path d="M20 5c0 3-2 4-2 6.5S20 16 20 16c-3.5 1-6-1-6-4.5 0-2 1-3 1-5.5 0 0 2.5-1 5-1Z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function GeneralIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+    </svg>
+  );
+}
+
 const registry: Record<IconName, (props: IconProps) => ReactElement> = {
   biology: BiologyIcon,
   calculus: CalculusIcon,
   history: HistoryIcon,
   physics: PhysicsIcon,
   english: EnglishIcon,
+  math: MathIcon,
+  chemistry: ChemistryIcon,
+  computer_science: ComputerScienceIcon,
+  art: ArtIcon,
+  music: MusicIcon,
+  language: LanguageIcon,
+  geography: GeographyIcon,
+  economics: EconomicsIcon,
+  psychology: PsychologyIcon,
+  pe: PeIcon,
+  law: LawIcon,
+  medicine: MedicineIcon,
+  philosophy: PhilosophyIcon,
+  business: BusinessIcon,
+  astronomy: AstronomyIcon,
+  statistics: StatisticsIcon,
+  engineering: EngineeringIcon,
+  literature: LiteratureIcon,
+  geology: GeologyIcon,
+  theater: TheaterIcon,
+  general: GeneralIcon,
 };
 
 export function SubjectIcon({ name, className }: { name: IconName; className?: string }) {

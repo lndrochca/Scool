@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { CheckIcon, CloudCheckIcon, DeviceIcon, LaptopIcon, LogOutIcon, MoonIcon, SunIcon } from "../../components/icons";
+import { CheckIcon, CloudCheckIcon, DeviceIcon, LaptopIcon, LogOutIcon, MoonIcon, SunIcon } from "../../components/ui/icons";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme, isValidHex } from "../../context/ThemeContext";
 import { useAppData } from "../../context/AppDataContext";
 import "../shared/page.css";
 import "../shared/settings-common.css";
-import "../../components/RecentNotes.css";
-import "../../components/UpcomingPanel.css";
+import "../../components/dashboard/RecentNotes.css";
+import "../../components/dashboard/UpcomingPanel.css";
 import "./Settings.css";
 
 interface ToggleRowProps {

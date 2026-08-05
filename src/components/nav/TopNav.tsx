@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
-import type { PageName } from "../types";
-import { FlashcardIcon, MenuIcon, SettingsIcon, UserIcon } from "./icons";
-import { useAuth } from "../context/AuthContext";
+import type { PageName } from "../../types";
+import { FlashcardIcon, MenuIcon, SettingsIcon, UserIcon } from "../ui/icons";
+import { useAuth } from "../../context/AuthContext";
 import { NotificationBell } from "./NotificationBell";
 import "./TopNav.css";
 

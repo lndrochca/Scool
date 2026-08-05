@@ -1,16 +1,35 @@
 export type AccentColor = "green" | "orange" | "tan" | "red" | "amber";
 
-/** Preset options for organizing subjects on the Bookshelf. Free text is still allowed. */
-export const SEMESTER_OPTIONS = [
-  "1st Semester",
-  "2nd Semester",
-  "Summer",
-  "Review Materials",
-  "Reference Books",
-  "Archived",
-] as const;
+/** Fixed assignment options for organizing subjects on the Bookshelf and Library. */
+export const SEMESTER_OPTIONS = ["1st Semester", "2nd Semester", "3rd Semester"] as const;
 
-export type IconName = "biology" | "calculus" | "history" | "physics" | "english";
+export type IconName =
+  | "biology"
+  | "calculus"
+  | "history"
+  | "physics"
+  | "english"
+  | "math"
+  | "chemistry"
+  | "computer_science"
+  | "art"
+  | "music"
+  | "language"
+  | "geography"
+  | "economics"
+  | "psychology"
+  | "pe"
+  | "law"
+  | "medicine"
+  | "philosophy"
+  | "business"
+  | "astronomy"
+  | "statistics"
+  | "engineering"
+  | "literature"
+  | "geology"
+  | "theater"
+  | "general";
 
 export interface Subject {
   id: string;
@@ -18,6 +37,8 @@ export interface Subject {
   code: string;
   icon: IconName;
   color: AccentColor;
+  /** Hex color chosen via the Library/Bookshelf color picker. Takes priority over `color` wherever set. */
+  customColor?: string;
   notesCount: number;
   gradePercent: number;
   letterGrade: string;

@@ -1,5 +1,5 @@
-import { useAuth } from "../context/AuthContext";
-import { CloudCheckIcon, XIcon } from "./icons";
+import { useAuth } from "../../context/AuthContext";
+import { CloudCheckIcon, XIcon } from "../ui/icons";
 import "./GuestPromptModal.css";
 
 export function GuestPromptModal() {

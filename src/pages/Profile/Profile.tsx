@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
 import { useAuth } from "../../context/AuthContext";
-import { CheckIcon, CloudCheckIcon, LockIcon, LogOutIcon, PencilIcon } from "../../components/icons";
+import { CheckIcon, CloudCheckIcon, LockIcon, LogOutIcon, PencilIcon } from "../../components/ui/icons";
 import "../shared/page.css";
 import "../shared/settings-common.css";
-import "../../components/RecentNotes.css";
-import "../../components/UpcomingPanel.css";
+import "../../components/dashboard/RecentNotes.css";
+import "../../components/dashboard/UpcomingPanel.css";
 import "./Profile.css";
 
 export function Profile() {

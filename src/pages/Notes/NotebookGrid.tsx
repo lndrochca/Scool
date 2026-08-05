@@ -1,6 +1,6 @@
 import type { Note, Subject } from "../../types";
-import { NotebookIcon, SubjectIcon } from "../../components/icons";
-import { EmptyState } from "../../components/EmptyState";
+import { NotebookIcon, SubjectIcon } from "../../components/ui/icons";
+import { EmptyState } from "../../components/ui/EmptyState";
 import "./Notes.css";
 
 interface Props {

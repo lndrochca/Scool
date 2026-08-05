@@ -2,8 +2,8 @@ import { useRef, useState, type ReactElement } from "react";
 import { useAppData } from "../../context/AppDataContext";
 import { generateNotes } from "../../data/noteGenerator";
 import { generateFlashcardsFromSections } from "../../data/flashcardGenerator";
-import { NoteEditor } from "../../components/NoteEditor";
-import { SparkleIcon, TextPasteIcon, TypeIcon, UploadQuickIcon } from "../../components/icons";
+import { NoteEditor } from "../../components/notes/NoteEditor";
+import { SparkleIcon, TextPasteIcon, TypeIcon, UploadQuickIcon } from "../../components/ui/icons";
 import type { AccentColor, IconName, NoteSection, NoteSourceType } from "../../types";
 import "./Notes.css";
 

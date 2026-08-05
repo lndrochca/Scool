@@ -2,7 +2,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 30px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
 }
 .shelf-toolbar-label {
   font-size: 12.5px;
@@ -18,6 +19,7 @@
   font-size: 12.5px;
   font-weight: 600;
   color: var(--text-soft);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .shelf-toggle.is-active { background: var(--accent); color: var(--accent-contrast); border-color: var(--accent); }
 .shelf-toggle:hover:not(.is-active) { background: var(--chip-bg); }
@@ -50,6 +52,7 @@
   flex-wrap: wrap;
   align-items: flex-end;
   padding-bottom: 14px;
+  justify-content: flex-start;
 }
 .shelf-plank {
   height: 10px;
@@ -76,35 +79,32 @@
   align-items: flex-start;
   gap: 8px;
   position: relative;
-  color: #fff;
+  color: var(--sc-text);
+  background: linear-gradient(155deg, color-mix(in srgb, var(--sc) 78%, white), var(--sc));
   text-align: left;
   box-shadow: var(--shadow-md), inset -6px 0 0 rgba(0,0,0,0.12);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 .book:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg), inset -6px 0 0 rgba(0,0,0,0.12); }
 .book:active { transform: translateY(-3px); }
-.book--green { background: linear-gradient(155deg, #3FB863, #2FA84F); }
-.book--orange { background: linear-gradient(155deg, #F3872A, #E8720C); }
-.book--tan { background: linear-gradient(155deg, #2B8CF0, #0071E3); }
-.book--red { background: linear-gradient(155deg, #EA544A, #E0342A); }
-.book--amber { background: linear-gradient(155deg, #D9A521, #C79000); }
 
 .book-favorite {
   position: absolute;
   top: 10px;
   right: 10px;
-  color: rgba(255,255,255,0.75);
+  color: color-mix(in srgb, var(--sc-text) 75%, transparent);
   display: inline-flex;
   padding: 4px;
+  transition: color 0.15s ease;
 }
 .book-favorite svg { width: 15px; height: 15px; }
-.book-favorite:hover { color: #fff; }
+.book-favorite:hover { color: var(--sc-text); }
 
 .book-icon {
   width: 30px;
   height: 30px;
   border-radius: 9px;
-  background: rgba(255,255,255,0.22);
+  background: color-mix(in srgb, var(--sc-text) 20%, transparent);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -117,6 +117,10 @@
   font-size: 14px;
   line-height: 1.25;
   margin-top: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .book-code {
   font-family: ui-monospace, monospace;
@@ -129,13 +133,13 @@
   justify-content: space-between;
   width: 100%;
   font-size: 10.5px;
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
 .book-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .book-move-wrap { position: relative; }
@@ -165,7 +169,32 @@
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-md);
+  animation: book-pop-in 0.13s ease;
 }
+.book-edit-popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  padding: 14px;
+  box-shadow: var(--shadow-lg);
+  animation: book-pop-in 0.13s ease;
+}
+@keyframes book-pop-in {
+  from { opacity: 0; transform: translate(-50%, 4px) scale(0.98); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+.book-edit-popover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  white-space: nowrap;
+}
+
 .book-move-menu-label {
   font-size: 10.5px;
   font-weight: 700;
@@ -205,9 +234,20 @@
 .book-reorder button:hover:not(:disabled) { background: var(--chip-bg); }
 .book-reorder button:disabled { opacity: 0.3; }
 
+/* Responsive: tablets */
+@media (max-width: 900px) {
+  .shelf-row { gap: 16px; justify-content: center; }
+}
+
+/* Responsive: phones */
 @media (max-width: 640px) {
-  .shelf-row { gap: 14px; justify-content: center; }
-  .book { width: 104px; height: 152px; padding: 13px 11px; }
+  .shelf-row { gap: 12px; justify-content: center; }
+  .book { width: 108px; height: 154px; padding: 13px 11px; }
   .book-title { font-size: 12.5px; }
   .book-code { font-size: 9.5px; }
+  .book-move-menu, .book-edit-popover { left: 0; transform: none; }
+}
+
+@media (max-width: 400px) {
+  .book { width: 46vw; min-width: 92px; }
 }

@@ -33,6 +33,7 @@
   font-size: 14px;
   font-family: inherit;
   color: var(--text);
+  background: var(--bg);
   resize: vertical;
 }
 .notes-text-input:focus, .notes-textarea:focus { outline: none; border-color: var(--text-faint); }
@@ -62,15 +63,19 @@
   flex-wrap: wrap;
   margin-bottom: 16px;
 }
+.notes-result-head > *:first-child {
+  flex: 1;
+  min-width: 0;
+}
 .notes-title-input {
   border: none;
   background: transparent;
-
   font-weight: 600;
   font-size: 22px;
   padding: 2px;
   color: var(--text);
-  min-width: 260px;
+  min-width: 0;
+  width: 100%;
 }
 .notes-title-input:focus { outline: none; border-bottom: 1px solid var(--border); }
 .notes-save-row {

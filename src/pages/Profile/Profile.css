@@ -52,6 +52,7 @@
   font-size: 14px;
   font-family: inherit;
   color: var(--text);
+  min-width: 0;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .settings-input:focus {

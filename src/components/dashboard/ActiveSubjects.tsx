@@ -1,5 +1,5 @@
-import type { Subject } from "../types";
-import { SubjectIcon } from "./icons";
+import type { Subject } from "../../types";
+import { SubjectIcon } from "../ui/icons";
 import "./ActiveSubjects.css";
 
 interface Props {

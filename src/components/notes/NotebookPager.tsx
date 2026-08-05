@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { NoteSection } from "../types";
+import type { NoteSection } from "../../types";
 import "./NotebookPager.css";
 
 interface Props {

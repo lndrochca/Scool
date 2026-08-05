@@ -3,10 +3,10 @@ import { useAppData } from "../../context/AppDataContext";
 import { GeneratorPanel } from "./GeneratorPanel";
 import { NotebookGrid } from "./NotebookGrid";
 import { NotebookView } from "./NotebookView";
-import { BookmarkIcon, ClockIcon, SearchIcon, SubjectIcon } from "../../components/icons";
+import { BookmarkIcon, ClockIcon, SearchIcon, SubjectIcon } from "../../components/ui/icons";
 import { formatTimeAgo } from "../../utils/time";
 import "../shared/page.css";
-import "../../components/RecentNotes.css";
+import "../../components/dashboard/RecentNotes.css";
 import "./Notes.css";
 
 type View = { kind: "grid" } | { kind: "notebook"; subjectId: string | null; scrollTo?: string };

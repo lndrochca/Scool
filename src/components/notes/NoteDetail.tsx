@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import type { Note } from "../types";
-import { useAppData } from "../context/AppDataContext";
-import { generateFlashcardsFromSections } from "../data/flashcardGenerator";
-import { formatTimeAgo } from "../utils/time";
-import { BookmarkIcon, ChevronDownIcon, SparkleIcon, SubjectIcon, TrashIcon } from "./icons";
+import type { Note } from "../../types";
+import { useAppData } from "../../context/AppDataContext";
+import { generateFlashcardsFromSections } from "../../data/flashcardGenerator";
+import { formatTimeAgo } from "../../utils/time";
+import { BookmarkIcon, ChevronDownIcon, SparkleIcon, SubjectIcon, TrashIcon } from "../ui/icons";
 import { NotebookPager } from "./NotebookPager";
 import "./NoteDetail.css";
 

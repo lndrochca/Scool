@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
 import { generateFlashcards } from "../../data/flashcardGenerator";
-import { SubjectIcon, PencilIcon, TrashIcon, PlusIcon, BackIcon, ShuffleIcon, XIcon, CheckIcon } from "../../components/icons";
+import { SubjectIcon, PencilIcon, TrashIcon, PlusIcon, BackIcon, ShuffleIcon, XIcon, CheckIcon } from "../../components/ui/icons";
 import type { Flashcard, FlashcardSet } from "../../types";
 import "../shared/page.css";
-import "../../components/RecentNotes.css";
+import "../../components/dashboard/RecentNotes.css";
 import "../Notes/Notes.css";
 import "../SubjectWorkspace/SubjectWorkspace.css";
 import "./Flashcards.css";

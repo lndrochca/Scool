@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
-import { NoteDetail } from "../../components/NoteDetail";
-import { EmptyState } from "../../components/EmptyState";
+import { NoteDetail } from "../../components/notes/NoteDetail";
+import { EmptyState } from "../../components/ui/EmptyState";
 import { GeneratorPanel } from "./GeneratorPanel";
-import { BackIcon, NotebookIcon, PlusIcon, SearchIcon, SubjectIcon } from "../../components/icons";
+import { BackIcon, NotebookIcon, PlusIcon, SearchIcon, SubjectIcon } from "../../components/ui/icons";
 import type { Note, Subject } from "../../types";
 import "../shared/page.css";
 import "./Notes.css";

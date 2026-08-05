@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
-import { GradeExplorer } from "../../components/GradeExplorer";
+import { GradeExplorer } from "../../components/ui/GradeExplorer";
 import { computeNodeStats, createEmptyRoot, toLetter } from "../../data/gradeTree";
-import { NoteDetail } from "../../components/NoteDetail";
+import { NoteDetail } from "../../components/notes/NoteDetail";
 import { formatTimeAgo, formatDue } from "../../utils/time";
+import { subjectHex, subjectColorVars } from "../../utils/color";
 import type { AssignmentPriority, LibraryFile, ResourceKind, WorkspaceTabTarget } from "../../types";
 import {
   SubjectIcon,
@@ -17,10 +18,10 @@ import {
   PencilIcon,
   TrashIcon,
   UploadQuickIcon,
-} from "../../components/icons";
+} from "../../components/ui/icons";
 import "../shared/page.css";
-import "../../components/NoteEditor.css";
-import "../../components/NoteDetail.css";
+import "../../components/notes/NoteEditor.css";
+import "../../components/notes/NoteDetail.css";
 import "./SubjectWorkspace.css";
 
 const TABS: { key: WorkspaceTabTarget; label: string }[] = [
@@ -208,7 +209,7 @@ export function SubjectWorkspace({ subjectId, onBack, onOpenFlashcards, initialT
       <button className="workspace-back" onClick={onBack}><BackIcon /> Back to Library</button>
 
       <div className="workspace-head">
-        <span className={`lib-icon lib-icon--${subject.color}`}>
+        <span className="lib-icon" style={subjectColorVars(subjectHex(subject)) as React.CSSProperties}>
           <SubjectIcon name={subject.icon} />
         </span>
         <div>

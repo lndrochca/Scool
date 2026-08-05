@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { useAuth } from "../context/AuthContext";
-import { AlertIcon, EyeIcon, EyeOffIcon, LockIcon, MailIcon, SpinnerIcon, UserIcon, XIcon } from "./icons";
+import { useAuth } from "../../context/AuthContext";
+import { AlertIcon, EyeIcon, EyeOffIcon, LockIcon, MailIcon, SpinnerIcon, UserIcon, XIcon } from "../ui/icons";
 import "./AuthModal.css";
 
 const REASON_COPY: Record<string, { title: string; sub: string }> = {

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { GradeNode } from "../types";
+import type { GradeNode } from "../../types";
 import {
   addChild,
   computeNodeStats,
@@ -17,7 +17,7 @@ import {
   reorderToIndex,
   toLetter,
   updateNode,
-} from "../data/gradeTree";
+} from "../../data/gradeTree";
 import {
   ChevronDownIcon,
   ChevronRightIcon,

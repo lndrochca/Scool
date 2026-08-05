@@ -1,10 +1,12 @@
 .lib-toolbar {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 20px;
 }
 .lib-search {
   flex: 1;
+  min-width: 180px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -12,7 +14,9 @@
   border: 1px solid var(--border);
   border-radius: 100px;
   padding: 0 14px;
+  transition: border-color 0.15s ease;
 }
+.lib-search:focus-within { border-color: var(--accent); }
 .lib-search-icon { width: 15px; height: 15px; color: var(--text-faint); flex-shrink: 0; }
 .lib-search input {
   border: none;
@@ -24,11 +28,18 @@
   color: var(--text);
   font-family: inherit;
 }
+
+.lib-toolbar-selects {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 .lib-sort {
   border: 1px solid var(--border);
   background: var(--card);
   border-radius: 100px;
   padding: 0 14px;
+  height: 38px;
   font-size: 13px;
   font-weight: 600;
   color: var(--text-soft);
@@ -37,90 +48,57 @@
 .lib-add-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
   background: var(--accent);
   color: var(--accent-contrast);
   border: none;
   border-radius: 100px;
   padding: 0 18px;
+  height: 38px;
   font-size: 13.5px;
   font-weight: 600;
   white-space: nowrap;
+  transition: opacity 0.15s ease, transform 0.1s ease;
 }
 .lib-add-btn svg { width: 14px; height: 14px; }
-.lib-add-btn:hover { opacity: 0.85; }
+.lib-add-btn:hover { opacity: 0.88; }
+.lib-add-btn:active { transform: scale(0.98); }
 
 .lib-add-card {
   padding: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: lib-card-in 0.16s ease;
+}
+@keyframes lib-card-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 .lib-add-row {
   display: flex;
   gap: 10px;
-  margin-bottom: 14px;
-}
-.lib-add-row:last-child { margin-bottom: 0; }
-.lib-add-row--options {
-  align-items: center;
   flex-wrap: wrap;
 }
 .lib-add-input {
   flex: 1;
+  min-width: 160px;
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 13.5px;
   font-family: inherit;
   color: var(--text);
-}
-.lib-add-input--code { flex: 0.6; }
-
-.lib-swatches, .lib-colors {
-  display: flex;
-  gap: 6px;
-}
-.lib-swatch {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  border: 1px solid var(--border);
   background: var(--card);
-  color: var(--text-faint);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
-.lib-swatch svg { width: 15px; height: 15px; }
-.lib-swatch.is-active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border); }
-
-.lib-color-dot {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  cursor: pointer;
-}
-.lib-color-dot--green { background: var(--green); }
-.lib-color-dot--orange { background: var(--orange); }
-.lib-color-dot--tan { background: var(--tan); }
-.lib-color-dot--red { background: var(--red); }
-.lib-color-dot--amber { background: var(--amber); }
-.lib-color-dot.is-active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-ring); }
-
-.lib-semester-select {
-  border: 1px solid var(--border);
-  background: var(--card);
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--text-soft);
-  font-family: inherit;
-}
+.lib-add-input:focus { outline: none; border-color: var(--accent); }
+.lib-add-input--code { flex: 0.6; min-width: 140px; }
 
 .lib-add-actions {
-  margin-left: auto;
   display: flex;
+  justify-content: flex-end;
   gap: 8px;
 }
 
@@ -129,19 +107,24 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
   .lib-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 600px) {
-  .lib-grid { grid-template-columns: 1fr; }
-  .lib-toolbar { flex-wrap: wrap; }
+@media (max-width: 640px) {
+  .lib-grid { grid-template-columns: 1fr; gap: 12px; }
+  .lib-toolbar { flex-direction: column; align-items: stretch; }
+  .lib-toolbar-selects { display: grid; grid-template-columns: 1fr 1fr; }
+  .lib-add-btn { height: 42px; }
 }
 
 .lib-card {
   padding: 16px;
   display: flex;
   flex-direction: column;
+  transition: box-shadow 0.18s ease, transform 0.15s ease;
 }
+.lib-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
 .lib-card-top {
   display: flex;
   align-items: flex-start;
@@ -155,8 +138,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  background: color-mix(in srgb, var(--sc) 14%, var(--card));
+  color: var(--sc);
+  transition: background 0.15s ease, color 0.15s ease;
 }
 .lib-icon svg { width: 19px; height: 19px; }
+
 .lib-card-actions {
   display: flex;
   gap: 4px;
@@ -166,12 +153,36 @@
   position: absolute;
   right: 0;
   top: 34px;
-  z-index: 10;
-  min-width: 140px;
+  z-index: 20;
+  min-width: 170px;
   padding: 6px;
   display: flex;
   flex-direction: column;
+  box-shadow: var(--shadow-md);
+  animation: lib-pop-in 0.13s ease;
 }
+.lib-edit-popover {
+  position: absolute;
+  right: 0;
+  top: 34px;
+  z-index: 25;
+  padding: 14px;
+  box-shadow: var(--shadow-lg);
+  animation: lib-pop-in 0.13s ease;
+}
+@keyframes lib-pop-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.lib-edit-popover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
 .lib-menu button {
   display: flex;
   align-items: center;
@@ -184,10 +195,18 @@
   font-weight: 500;
   color: var(--text);
   text-align: left;
+  transition: background 0.12s ease;
 }
 .lib-menu button:hover { background: var(--chip-bg); }
 .lib-menu button svg { width: 14px; height: 14px; }
 .lib-menu-danger { color: var(--red) !important; }
+.lib-menu-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
 
 .lib-card-body {
   background: transparent;
@@ -197,16 +216,26 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  width: 100%;
 }
 .lib-card-name {
-
   font-weight: 600;
   font-size: 17px;
   margin-top: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.lib-card-code {
-  margin-top: 6px;
+.lib-card-meta-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
   align-self: flex-start;
+}
+.lib-card-semester {
+  color: var(--sc);
+  background: color-mix(in srgb, var(--sc) 12%, var(--card));
 }
 .lib-card-foot {
   display: flex;
@@ -214,6 +243,11 @@
   font-size: 11.5px;
   color: var(--text-faint);
   margin-top: 4px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s ease;
 }
 
 .lib-rename-row {
@@ -237,4 +271,8 @@
   text-align: center;
   color: var(--text-faint);
   font-size: 13.5px;
+}
+
+@media (max-width: 480px) {
+  .lib-edit-popover, .lib-menu { right: -8px; }
 }

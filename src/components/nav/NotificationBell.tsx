@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { useNotifications } from "../context/NotificationsContext";
-import { formatTimeAgo } from "../utils/time";
-import { BellIcon, CalendarClockIcon, CircleAlertIcon, CheckIcon, SparkleIcon, TrendingUpIcon, XIcon } from "./icons";
-import type { NotificationItem, NotificationType } from "../types";
+import { useNotifications } from "../../context/NotificationsContext";
+import { formatTimeAgo } from "../../utils/time";
+import { BellIcon, CalendarClockIcon, CircleAlertIcon, CheckIcon, SparkleIcon, TrendingUpIcon, XIcon } from "../ui/icons";
+import type { NotificationItem, NotificationType } from "../../types";
 import "./NotificationBell.css";
 
 const TYPE_ICON: Record<NotificationType, React.ComponentType<{ className?: string }>> = {
@@ -65,31 +65,34 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="notif-panel card">
-          <div className="notif-panel-head">
-            <h3>Notifications</h3>
-            {notifications.length > 0 && (
-              <div className="notif-panel-actions">
-                <button onClick={markAllRead} disabled={unreadCount === 0}>
-                  <CheckIcon /> Mark all read
-                </button>
-                <button onClick={clearAll} className="notif-panel-clear">Clear all</button>
-              </div>
-            )}
+        <>
+          <div className="notif-backdrop" onClick={() => setOpen(false)} aria-hidden />
+          <div className="notif-panel card">
+            <div className="notif-panel-head">
+              <h3>Notifications</h3>
+              {notifications.length > 0 && (
+                <div className="notif-panel-actions">
+                  <button onClick={markAllRead} disabled={unreadCount === 0}>
+                    <CheckIcon /> Mark all read
+                  </button>
+                  <button onClick={clearAll} className="notif-panel-clear">Clear all</button>
+                </div>
+              )}
+            </div>
+            <ul className="notif-list">
+              {notifications.map((item) => (
+                <NotificationRow key={item.id} item={item} onRead={markRead} onClear={clear} />
+              ))}
+              {notifications.length === 0 && (
+                <li className="notif-empty">
+                  <BellIcon />
+                  <p>You're all caught up.</p>
+                  <span>Deadline alerts and grade updates will show up here.</span>
+                </li>
+              )}
+            </ul>
           </div>
-          <ul className="notif-list">
-            {notifications.map((item) => (
-              <NotificationRow key={item.id} item={item} onRead={markRead} onClear={clear} />
-            ))}
-            {notifications.length === 0 && (
-              <li className="notif-empty">
-                <BellIcon />
-                <p>You're all caught up.</p>
-                <span>Deadline alerts and grade updates will show up here.</span>
-              </li>
-            )}
-          </ul>
-        </div>
+        </>
       )}
     </div>
   );

@@ -30,10 +30,11 @@
   gap: 16px;
   padding: 16px 18px;
   border-bottom: 1px solid var(--border-soft);
+  flex-wrap: wrap;
 }
 .settings-panel .settings-row:last-child { border-bottom: none; }
 
-.settings-row-text { min-width: 0; }
+.settings-row-text { min-width: 0; flex: 1; }
 .settings-row-label {
   font-weight: 600;
   font-size: 13.5px;
@@ -54,6 +55,7 @@
   color: var(--text-soft);
   font-family: inherit;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 /* Toggle switch */

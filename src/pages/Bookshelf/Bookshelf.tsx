@@ -1,8 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
-import { SubjectIcon } from "../../components/icons";
-import { PinIcon, FolderMoveIcon } from "../../components/icons";
+import { SubjectIcon } from "../../components/ui/icons";
+import { PinIcon, FolderMoveIcon, DotsIcon, XIcon } from "../../components/ui/icons";
 import { SEMESTER_OPTIONS } from "../../types";
+import { AppearanceFields } from "../../components/ui/AppearanceFields";
+import { subjectHex, subjectColorVars } from "../../utils/color";
 import "../shared/page.css";
 import "./Bookshelf.css";
 
@@ -29,6 +31,20 @@ export function Bookshelf({ onOpenSubject }: { onOpenSubject: (id: string) => vo
   const [groupBy, setGroupBy] = useState<GroupBy>("semester");
   const [order, setOrder] = useState<string[]>(subjects.map((s) => s.id));
   const [moveMenuId, setMoveMenuId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!moveMenuId && !editId) return;
+    const onClick = (e: MouseEvent) => {
+      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+        setMoveMenuId(null);
+        setEditId(null);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [moveMenuId, editId]);
 
   const orderedIds = useMemo(() => {
     const existing = new Set(subjects.map((s) => s.id));
@@ -102,53 +118,85 @@ export function Bookshelf({ onOpenSubject }: { onOpenSubject: (id: string) => vo
           </div>
           <div className="shelf">
             <div className="shelf-row">
-              {group.items.map((s, i) => (
-                <div className="book-wrap" key={s.id}>
-                  <button
-                    className={`book book--${s.color}`}
-                    onClick={() => onOpenSubject(s.id)}
-                    title={s.name}
-                  >
-                    <span className="book-favorite" onClick={(e) => { e.stopPropagation(); togglePin(s.id); }}>
-                      <PinIcon filled={s.pinned} />
-                    </span>
-                    <span className="book-icon"><SubjectIcon name={s.icon} /></span>
-                    <span className="book-title">{s.name}</span>
-                    <span className="book-code">{s.code}</span>
-                    <div className="book-foot">
-                      <span>{s.notesCount} notes</span>
-                      <span>{s.gradePercent > 0 ? `${s.gradePercent}%` : "—"}</span>
-                    </div>
-                  </button>
-                  <div className="book-controls">
-                    <div className="book-move-wrap">
-                      <button
-                        className="book-move-btn"
-                        onClick={(e) => { e.stopPropagation(); setMoveMenuId(moveMenuId === s.id ? null : s.id); }}
-                        aria-label="Move to section"
-                        title="Move to section"
-                      >
-                        <FolderMoveIcon />
-                      </button>
-                      {moveMenuId === s.id && (
-                        <div className="book-move-menu card">
-                          <div className="book-move-menu-label">Move to…</div>
-                          <button onClick={() => assignSemester(s.id, "")}>Unassigned</button>
-                          {SEMESTER_OPTIONS.map((opt) => (
-                            <button key={opt} onClick={() => assignSemester(s.id, opt)} className={s.semester === opt ? "is-current" : ""}>
-                              {opt}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div className="book-reorder">
-                      <button disabled={i === 0} onClick={() => move(s.id, -1)}>‹</button>
-                      <button disabled={i === group.items.length - 1} onClick={() => move(s.id, 1)}>›</button>
+              {group.items.map((s, i) => {
+                const hex = subjectHex(s);
+                const vars = subjectColorVars(hex) as React.CSSProperties;
+                return (
+                  <div className="book-wrap" key={s.id}>
+                    <button
+                      className="book"
+                      style={vars}
+                      onClick={() => onOpenSubject(s.id)}
+                      title={s.name}
+                    >
+                      <span className="book-favorite" onClick={(e) => { e.stopPropagation(); togglePin(s.id); }}>
+                        <PinIcon filled={s.pinned} />
+                      </span>
+                      <span className="book-icon"><SubjectIcon name={s.icon} /></span>
+                      <span className="book-title">{s.name}</span>
+                      <span className="book-code">{s.code}</span>
+                      <div className="book-foot">
+                        <span>{s.notesCount} notes</span>
+                        <span>{s.gradePercent > 0 ? `${s.gradePercent}%` : "—"}</span>
+                      </div>
+                    </button>
+                    <div className="book-controls">
+                      <div className="book-move-wrap">
+                        <button
+                          className="book-move-btn"
+                          onClick={(e) => { e.stopPropagation(); setEditId(null); setMoveMenuId(moveMenuId === s.id ? null : s.id); }}
+                          aria-label="Move to section"
+                          title="Move to section"
+                        >
+                          <FolderMoveIcon />
+                        </button>
+                        {moveMenuId === s.id && (
+                          <div className="book-move-menu card" ref={popoverRef}>
+                            <div className="book-move-menu-label">Move to…</div>
+                            <button onClick={() => assignSemester(s.id, "")}>Unassigned</button>
+                            {SEMESTER_OPTIONS.map((opt) => (
+                              <button key={opt} onClick={() => assignSemester(s.id, opt)} className={s.semester === opt ? "is-current" : ""}>
+                                {opt}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className="book-move-wrap">
+                        <button
+                          className="book-move-btn"
+                          onClick={(e) => { e.stopPropagation(); setMoveMenuId(null); setEditId(editId === s.id ? null : s.id); }}
+                          aria-label="Edit appearance"
+                          title="Edit appearance"
+                        >
+                          <DotsIcon />
+                        </button>
+                        {editId === s.id && (
+                          <div className="book-edit-popover card" ref={popoverRef} onClick={(e) => e.stopPropagation()}>
+                            <div className="book-edit-popover-head">
+                              <span>Edit appearance</span>
+                              <button className="icon-btn" onClick={() => setEditId(null)} aria-label="Close"><XIcon /></button>
+                            </div>
+                            <AppearanceFields
+                              compact
+                              icon={s.icon}
+                              color={hex}
+                              semester={s.semester ?? ""}
+                              onIconChange={(icon) => updateSubject(s.id, { icon })}
+                              onColorChange={(customColor) => updateSubject(s.id, { customColor })}
+                              onSemesterChange={(semester) => updateSubject(s.id, { semester: semester || undefined })}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div className="book-reorder">
+                        <button disabled={i === 0} onClick={() => move(s.id, -1)} aria-label="Move earlier">‹</button>
+                        <button disabled={i === group.items.length - 1} onClick={() => move(s.id, 1)} aria-label="Move later">›</button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="shelf-plank" />
           </div>

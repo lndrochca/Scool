@@ -1,5 +1,5 @@
-import type { UpcomingItem } from "../types";
-import { SubjectIcon } from "./icons";
+import type { UpcomingItem } from "../../types";
+import { SubjectIcon } from "../ui/icons";
 import "./UpcomingPanel.css";
 
 const urgencyClass: Record<UpcomingItem["urgency"], string> = {
