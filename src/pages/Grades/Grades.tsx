@@ -1,34 +1,110 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAppData } from "../../context/AppDataContext";
-import { parseSyllabus } from "../../data/gradeParser";
-import { computeNodeStats, createEmptyRoot, createTerm, toLetter, updateNode } from "../../data/gradeTree";
+import { computeNodeStats, createEmptyRoot, createFolder, createItem, createTerm, toLetter, updateNode } from "../../data/gradeTree";
 import { GradeExplorer } from "../../components/ui/GradeExplorer";
 import { TextPasteIcon, UploadQuickIcon, ChevronLeftIcon, GradesEmptyIcon } from "../../components/ui/icons";
 import { SubjectIcon } from "../../components/ui/icons";
+import { parseGradingFileWithGemini, parseGradingTextWithGemini } from "../../lib/gemini";
 import type { GradeNode } from "../../types";
 import "../shared/page.css";
 import "./Grades.css";
 
+function fileToBase64(file: File): Promise<{ base64: string; mimeType: string }> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // strip "data:<mime>;base64," prefix
+      const base64 = result.split(",")[1];
+      resolve({ base64, mimeType: file.type || "application/octet-stream" });
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export function Grades() {
   const { subjects, gradesBySubject, setGradeTree } = useAppData();
   const [syllabusText, setSyllabusText] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [extracting, setExtracting] = useState(false);
+  const [extractError, setExtractError] = useState<string | null>(null);
   const [draftRoot, setDraftRoot] = useState<GradeNode | null>(null);
   const [targetSubjectId, setTargetSubjectId] = useState<string>(subjects[0]?.id ?? "");
   const [activeSubjectId, setActiveSubjectId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleExtract = () => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const chosen = e.target.files?.[0] ?? null;
+    setFile(chosen);
+    setFileName(chosen?.name ?? null);
+    setExtractError(null);
+  };
+
+  const handleExtract = async () => {
     setExtracting(true);
-    window.setTimeout(() => {
-      const categories = parseSyllabus(syllabusText || fileName || "");
+    setExtractError(null);
+    setDraftRoot(null);
+
+    try {
+      let categories: { name: string; weight: number }[] = [];
+
+      if (file) {
+        const mimeType = file.type || "application/octet-stream";
+        const isPdf = mimeType === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+
+        if (isPdf) {
+          // PDFs: read as text using FileReader and send to text-based Gemini
+          const pdfText = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsText(file);
+          });
+
+          if (pdfText.trim().length > 20) {
+            categories = await parseGradingTextWithGemini(pdfText);
+          } else {
+            // PDF text extraction returned garbage (binary) — tell user to paste instead
+            throw new Error("This PDF can't be read as text. Take a screenshot of the grading section and upload that instead, or paste the grading criteria in the text box.");
+          }
+        } else {
+          // Image: send as base64 vision
+          const { base64, mimeType: mt } = await fileToBase64(file);
+          categories = await parseGradingFileWithGemini(base64, mt);
+        }
+      } else if (syllabusText.trim()) {
+        // Plain text paste → Gemini text parser
+        categories = await parseGradingTextWithGemini(syllabusText);
+      } else {
+        setExtractError("Paste some grading criteria or upload a file first.");
+        setExtracting(false);
+        return;
+      }
+
+      if (categories.length === 0) {
+        setExtractError("Couldn't find any grading categories. Try a clearer image or paste the text directly.");
+        setExtracting(false);
+        return;
+      }
+
       const root = createEmptyRoot("Draft grading structure");
       const term = createTerm("Term 1");
-      term.children = categories;
+      term.children = categories.map((c) => {
+        const folder = createFolder(c.name, c.weight);
+        folder.children = [createItem(`${c.name} 1`, 0, 100)];
+        return folder;
+      });
       root.children = [term];
       setDraftRoot(root);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Grade extraction failed:", err);
+      setExtractError(msg);
+    } finally {
       setExtracting(false);
-    }, 650);
+    }
   };
 
   const handleSaveDraft = () => {
@@ -37,6 +113,7 @@ export function Grades() {
     setGradeTree(targetSubjectId, updateNode(draftRoot, draftRoot.id, { name: targetName }));
     setDraftRoot(null);
     setSyllabusText("");
+    setFile(null);
     setFileName(null);
     setActiveSubjectId(targetSubjectId);
   };
@@ -47,13 +124,15 @@ export function Grades() {
   };
 
   const activeSubject = subjects.find((s) => s.id === activeSubjectId);
-  const activeRoot = activeSubjectId ? gradesBySubject[activeSubjectId] ?? createEmptyRoot(activeSubject?.name ?? "Grades") : null;
+  const activeRoot = activeSubjectId
+    ? gradesBySubject[activeSubjectId] ?? createEmptyRoot(activeSubject?.name ?? "Grades")
+    : null;
 
   return (
     <section className="page">
       <div className="eyebrow">Grade Calculator</div>
       <h1 className="page-title">Know your grade before finals do</h1>
-      <p className="page-sub">Upload a syllabus or enter grading info, Scool builds an editable, expandable grading folder structure.</p>
+      <p className="page-sub">Upload a syllabus image or PDF, or paste grading info — Scool builds an editable grading structure from it.</p>
 
       <div className="card grades-composer">
         <div className="grades-composer-row">
@@ -63,27 +142,44 @@ export function Grades() {
               rows={5}
               placeholder={`e.g.\nExams — 30%\nQuizzes — 20%\nAssignments — 25%\nParticipation — 10%\nFinal Exam — 15%`}
               value={syllabusText}
-              onChange={(e) => setSyllabusText(e.target.value)}
+              onChange={(e) => { setSyllabusText(e.target.value); setExtractError(null); }}
             />
           </div>
           <div className="grades-input-col grades-input-col--upload">
             <label className="grades-label"><UploadQuickIcon /> Or upload a syllabus</label>
             <input
+              ref={fileInputRef}
               type="file"
-              accept=".pdf,.png,.jpg,.jpeg"
+              accept=".pdf,.png,.jpg,.jpeg,.webp"
               id="syllabus-upload"
               style={{ display: "none" }}
-              onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
+              onChange={handleFileChange}
             />
-            <button className="btn-ghost" onClick={() => document.getElementById("syllabus-upload")?.click()}>
+            <button className="btn-ghost" onClick={() => fileInputRef.current?.click()}>
               <UploadQuickIcon /> Choose File / Image
             </button>
             {fileName && <span className="notes-filename">{fileName}</span>}
+            {fileName && (
+              <button
+                className="btn-ghost"
+                style={{ marginTop: 6, fontSize: 12 }}
+                onClick={() => { setFile(null); setFileName(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+              >
+                Remove
+              </button>
+            )}
           </div>
         </div>
+
         <button className="btn-solid grades-extract-btn" onClick={handleExtract} disabled={extracting}>
-          {extracting ? "Summarizing info..." : "+ Summarize"}
+          {extracting ? "Scanning with AI…" : "+ Summarize"}
         </button>
+
+        {extractError && (
+          <p style={{ color: "var(--red)", fontSize: 13, marginTop: 8 }}>
+            ⚠ {extractError}
+          </p>
+        )}
       </div>
 
       {draftRoot && (

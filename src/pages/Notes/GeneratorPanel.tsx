@@ -44,11 +44,12 @@ export function GeneratorPanel({ initialSubjectId, onSaved, onOpenFlashcards }: 
   const [input, setInput] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
   const [result, setResult] = useState<GeneratedResult | null>(null);
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>(initialSubjectId ?? "");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     const sourceText = mode === "paste" ? input : undefined;
     const promptInput = mode === "upload" ? fileName ?? "Uploaded material" : input;
     if (mode === "upload" && !fileName) return;
@@ -56,11 +57,17 @@ export function GeneratorPanel({ initialSubjectId, onSaved, onOpenFlashcards }: 
 
     setGenerating(true);
     setResult(null);
-    window.setTimeout(() => {
-      const generated = generateNotes(promptInput, sourceText);
+    setGenError(null);
+    try {
+      const generated = await generateNotes(promptInput, sourceText);
       setResult(generated);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Note generation failed:", err);
+      setGenError(msg);
+    } finally {
       setGenerating(false);
-    }, 650);
+    }
   };
 
   const buildNotePayload = () => {
@@ -92,13 +99,13 @@ export function GeneratorPanel({ initialSubjectId, onSaved, onOpenFlashcards }: 
     onSaved?.(noteId, built.subject?.id);
   };
 
-  const handleTurnIntoFlashcards = () => {
+  const handleTurnIntoFlashcards = async () => {
     const built = buildNotePayload();
     if (!built || !result) return;
-    const cards = generateFlashcardsFromSections(result.sections);
+    const cards = await generateFlashcardsFromSections(result.sections, { noteTitle: result.title });
     if (cards.length === 0) return;
 
-    // Save the note itself too, so it's still there to review in the notebook later.
+    // save the note too
     addNote(built.payload);
     const setId = addFlashcardSet({
       title: `${result.title} — Flashcards`,
@@ -171,6 +178,11 @@ export function GeneratorPanel({ initialSubjectId, onSaved, onOpenFlashcards }: 
         <button className="btn-solid notes-generate-btn" onClick={handleGenerate} disabled={generating}>
           <SparkleIcon /> {generating ? "Generating notes…" : "Generate Notes"}
         </button>
+        {genError && (
+          <p style={{ color: "var(--red)", fontSize: 13, marginTop: 8 }}>
+            ⚠ {genError}
+          </p>
+        )}
       </div>
 
       {result && (

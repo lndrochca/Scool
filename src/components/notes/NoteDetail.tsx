@@ -56,19 +56,29 @@ export function NoteDetail({
     debounceRef.current = window.setTimeout(() => onPersonalNotesChange(note.id, value), 500);
   };
 
-  const handleCreateFlashcards = (e: React.MouseEvent) => {
+  const [flashcardGenerating, setFlashcardGenerating] = useState(false);
+
+  const handleCreateFlashcards = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const cards = generateFlashcardsFromSections(note.sections);
-    if (cards.length === 0) return;
-    const setId = addFlashcardSet({
-      title: `${note.title} — Flashcards`,
-      subjectId: note.subjectId,
-      subjectName: note.subjectName,
-      icon: note.icon,
-      color: note.color,
-      cards,
-    });
-    onFlashcardsCreated?.(setId);
+    if (flashcardGenerating) return;
+    setFlashcardGenerating(true);
+    try {
+      const cards = await generateFlashcardsFromSections(note.sections, { noteTitle: note.title });
+      if (cards.length === 0) return;
+      const setId = addFlashcardSet({
+        title: `${note.title} — Flashcards`,
+        subjectId: note.subjectId,
+        subjectName: note.subjectName,
+        icon: note.icon,
+        color: note.color,
+        cards,
+      });
+      onFlashcardsCreated?.(setId);
+    } catch (err) {
+      console.error("Flashcard generation failed:", err);
+    } finally {
+      setFlashcardGenerating(false);
+    }
   };
 
   return (
@@ -92,7 +102,7 @@ export function NoteDetail({
               role="button"
               tabIndex={0}
               aria-label="Turn this note into a flashcard quiz"
-              title="Turn into Flashcard Quiz"
+              title={flashcardGenerating ? "Generating…" : "Turn into Flashcard Quiz"}
               className="icon-btn note-detail-flashcard-btn"
               onClick={handleCreateFlashcards}
               onKeyDown={(e) => {

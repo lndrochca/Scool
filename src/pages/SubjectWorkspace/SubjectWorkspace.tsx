@@ -5,6 +5,7 @@ import { computeNodeStats, createEmptyRoot, toLetter } from "../../data/gradeTre
 import { NoteDetail } from "../../components/notes/NoteDetail";
 import { formatTimeAgo, formatDue } from "../../utils/time";
 import { subjectHex, subjectColorVars } from "../../utils/color";
+import { askStudyBuddy } from "../../lib/gemini";
 import type { AssignmentPriority, LibraryFile, ResourceKind, WorkspaceTabTarget } from "../../types";
 import {
   SubjectIcon,
@@ -82,6 +83,8 @@ export function SubjectWorkspace({ subjectId, onBack, onOpenFlashcards, initialT
   const [tab, setTab] = useState<WorkspaceTabTarget>(initialTab ?? "overview");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
+  const [answering, setAnswering] = useState(false);
+  const [answerError, setAnswerError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [renamingFileId, setRenamingFileId] = useState<string | null>(null);
@@ -184,24 +187,27 @@ export function SubjectWorkspace({ subjectId, onBack, onOpenFlashcards, initialT
     return acc;
   }, {});
 
-  const askAssistant = () => {
-    if (!question.trim()) return;
-    const q = question.toLowerCase();
-    const hit = subjectNotes
-      .flatMap((n) => n.sections)
-      .flatMap((s) => s.bullets.map((b) => ({ heading: s.heading, bullet: b })))
-      .find((entry) => entry.bullet.toLowerCase().includes(q.split(" ")[0] ?? ""));
-
-    if (hit) {
-      setAnswer(`From your "${hit.heading}" notes: ${hit.bullet}`);
-    } else if (subjectNotes.length > 0) {
-      setAnswer(
-        `Based on ${subject.name}, here's a starting point: review your "${subjectNotes[0]?.title ?? "saved notes"}" for related concepts, and consider generating a fresh note on this exact question from the Notes page.`
-      );
-    } else {
-      setAnswer(`You don't have any notes saved for ${subject.name} yet — generate some from the Notes page first, then ask again for answers grounded in them.`);
-    }
+  const askAssistant = async () => {
+    if (!question.trim() || answering) return;
+    const q = question;
     setQuestion("");
+    setAnswering(true);
+    setAnswer(null);
+    setAnswerError(null);
+    try {
+      const noteContext = subjectNotes
+        .flatMap((n) => n.sections)
+        .map((s) => `${s.heading}: ${s.bullets.join(" ")}`)
+        .join("\n");
+      const response = await askStudyBuddy(subject?.name ?? "", q, noteContext);
+      setAnswer(response);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Study Buddy error:", err);
+      setAnswerError(msg);
+    } finally {
+      setAnswering(false);
+    }
   };
 
   return (
@@ -456,9 +462,14 @@ export function SubjectWorkspace({ subjectId, onBack, onOpenFlashcards, initialT
               onChange={(e) => setQuestion(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && askAssistant()}
             />
-            <button className="btn-solid" onClick={askAssistant}>Ask</button>
+            <button className="btn-solid" onClick={askAssistant} disabled={answering}>
+              {answering ? "Thinking…" : "Ask"}
+            </button>
           </div>
           {answer && <div className="workspace-assistant-answer">{answer}</div>}
+          {answerError && (
+            <p style={{ color: "var(--red)", fontSize: 13, marginTop: 8 }}>⚠ {answerError}</p>
+          )}
         </div>
       )}
 

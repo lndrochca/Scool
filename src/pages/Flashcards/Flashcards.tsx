@@ -28,6 +28,7 @@ export function Flashcards({ initialSetId, onInitialConsumed }: Props = {}) {
   const { flashcardSets, addFlashcardSet, deleteFlashcardSet } = useAppData();
   const [topic, setTopic] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
   const [activeSetId, setActiveSetId] = useState<string | null>(null);
   const [mode, setMode] = useState<"list" | "edit" | "study">("list");
 
@@ -41,11 +42,12 @@ export function Flashcards({ initialSetId, onInitialConsumed }: Props = {}) {
 
   const activeSet = flashcardSets.find((s) => s.id === activeSetId) ?? null;
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!topic.trim() || generating) return;
     setGenerating(true);
-    window.setTimeout(() => {
-      const generated = generateFlashcards(topic);
+    setGenError(null);
+    try {
+      const generated = await generateFlashcards(topic);
       const newId = addFlashcardSet({
         title: generated.title,
         subjectName: generated.subjectName,
@@ -54,10 +56,15 @@ export function Flashcards({ initialSetId, onInitialConsumed }: Props = {}) {
         cards: generated.cards,
       });
       setTopic("");
-      setGenerating(false);
       setActiveSetId(newId);
       setMode("edit");
-    }, 600);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Flashcard generation failed:", err);
+      setGenError(msg);
+    } finally {
+      setGenerating(false);
+    }
   };
 
   if (activeSet && mode === "edit") {
@@ -94,6 +101,11 @@ export function Flashcards({ initialSetId, onInitialConsumed }: Props = {}) {
             {generating ? "Generating…" : "+ Generate Set"}
           </button>
         </div>
+        {genError && (
+          <p style={{ color: "var(--red)", fontSize: 13, marginTop: 8 }}>
+            ⚠ {genError}
+          </p>
+        )}
       </div>
 
       <div className="fc-grid">
