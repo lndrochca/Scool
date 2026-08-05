@@ -1,11 +1,4 @@
-/**
- * Small localStorage helper used to namespace per-device / per-account data.
- *
- * Every piece of persisted state in the app (app data, appearance prefs)
- * is stored under a key scoped to the current "account key" — either
- * `guest` or a signed-in user's id — so switching accounts never mixes
- * data between users, and guest data stays local to this browser only.
- */
+// scoped localstorage helpers
 
 const PREFIX = "scool";
 
@@ -27,9 +20,7 @@ export function writeJSON<T>(key: string, value: T): void {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    // Storage can fail (private browsing, quota, etc). Failing silently is
-    // preferable to crashing the app — the user's session still works,
-    // it just won't persist across reloads.
+    // silent on quota/private mode
   }
 }
 

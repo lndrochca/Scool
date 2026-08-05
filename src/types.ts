@@ -1,6 +1,6 @@
 export type AccentColor = "green" | "orange" | "tan" | "red" | "amber";
 
-/** Fixed assignment options for organizing subjects on the Bookshelf and Library. */
+/** semester filter options */
 export const SEMESTER_OPTIONS = ["1st Semester", "2nd Semester", "3rd Semester"] as const;
 
 export type IconName =
@@ -37,7 +37,7 @@ export interface Subject {
   code: string;
   icon: IconName;
   color: AccentColor;
-  /** Hex color chosen via the Library/Bookshelf color picker. Takes priority over `color` wherever set. */
+  // custom hex overrides color
   customColor?: string;
   notesCount: number;
   gradePercent: number;
@@ -172,9 +172,7 @@ export type PageName =
   | "settings"
   | "subject";
 
-/* ---------------------------------------------------------------------- */
-/* Auth & account                                                          */
-/* ---------------------------------------------------------------------- */
+// auth & account
 
 export interface AuthUser {
   id: string;
@@ -183,21 +181,17 @@ export interface AuthUser {
   createdAt: number;
 }
 
-/* ---------------------------------------------------------------------- */
-/* Appearance / theme                                                      */
-/* ---------------------------------------------------------------------- */
+// appearance / theme
 
 export type ThemeMode = "light" | "dark" | "system";
 
-/* ---------------------------------------------------------------------- */
-/* Notifications                                                           */
-/* ---------------------------------------------------------------------- */
+// notifications
 
 export type NotificationType = "deadline" | "overdue" | "grade" | "system";
 
 export interface NotificationItem {
   id: string;
-  /** Stable key used to dedupe auto-generated notifications (e.g. one per assignment+urgency). */
+  // dedupe key for auto notifications
   dedupeKey: string;
   type: NotificationType;
   title: string;

@@ -66,7 +66,7 @@ function isEmptyData(data: PersistedAppData) {
   );
 }
 
-/** Loads data for `accountKey`, migrating local guest data in on first sign-in. */
+// loads data, migrates guest on sign-in
 function loadDataForAccount(accountKey: string): PersistedAppData {
   if (accountKey !== "guest" && !hasKey(dataKey(accountKey))) {
     const guestData = readJSON<PersistedAppData>(dataKey("guest"), EMPTY_DATA);
@@ -112,16 +112,16 @@ interface AppDataValue extends PersistedAppData {
   deleteFlashcardSet: (id: string) => void;
   updateFlashcardSetCards: (id: string, cards: Flashcard[]) => void;
 
-  /** Wipes all locally persisted data for the current account. */
+  // wipes all data for account
   clearAllData: () => void;
 
-  /** True once local persisted data has finished loading for the active account. */
+  // true once data loaded
   hydrated: boolean;
 }
 
 const AppDataContext = createContext<AppDataValue | null>(null);
 
-/** Wraps every function on `actions` so guest mutations trigger the sign-in nudge. */
+  // wraps every mutation to nudge guests
 function withGuestTracking<T extends Record<string, unknown>>(actions: T, onMutate: () => void): T {
   const wrapped = {} as T;
   for (const key of Object.keys(actions) as (keyof T)[]) {
@@ -154,9 +154,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
   const loadedAccountKey = useRef(accountKey);
 
-  // When the active account changes (sign in / sign out), swap in that
-  // account's persisted data. Guest -> account data is migrated once,
-  // inside loadDataForAccount, so nothing created as a guest is lost.
+  // swap data on account change
   useEffect(() => {
     if (loadedAccountKey.current === accountKey) return;
     loadedAccountKey.current = accountKey;
@@ -173,7 +171,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     setHydrated(true);
   }, [accountKey]);
 
-  // Persist to localStorage whenever data changes, scoped to the active account.
+  // debounced persist on change
   useEffect(() => {
     if (!hydrated) return;
     const snapshot: PersistedAppData = {

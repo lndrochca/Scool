@@ -32,9 +32,7 @@
   --shadow-md: 0 12px 28px -14px rgba(0, 0, 0, 0.14), 0 3px 8px -3px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 24px 48px -20px rgba(0, 0, 0, 0.22), 0 8px 16px -6px rgba(0, 0, 0, 0.08);
 
-  /* Brand accent — the base value is set inline by ThemeContext once it
-     mounts (from the user's saved preference); this is just the default
-     shown before that runs, so first paint isn't unstyled. */
+  /* accent default before theme loads */
   --accent: #3B82F6;
   --accent-contrast: #FFFFFF;
   --accent-soft: color-mix(in srgb, var(--accent) 12%, var(--card));
@@ -120,7 +118,7 @@ input, textarea, select { color-scheme: inherit; }
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.15s ease;
 }
 
-/* Shared control styles used across Library, Notes, Grades, Bookshelf, Subject Workspace */
+/* shared controls across pages */
 .btn-solid {
   background: var(--accent);
   color: var(--accent-contrast);

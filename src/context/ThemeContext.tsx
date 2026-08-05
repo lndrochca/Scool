@@ -14,14 +14,14 @@ function normalizeHex(value: string): string {
   const v = value.trim();
   if (!HEX_RE.test(v)) return DEFAULT_ACCENT;
   if (v.length === 4) {
-    // #abc -> #aabbcc
+    // #abc → #aabbcc
     const [, r, g, b] = v;
     return `#${r}${r}${g}${g}${b}${b}`.toUpperCase();
   }
   return v.toUpperCase();
 }
 
-/** Relative luminance (WCAG) -> pick black or white for readable text on the accent. */
+/** wcag luminance → readable text color */
 function contrastColorFor(hex: string): string {
   const h = normalizeHex(hex).slice(1);
   const r = parseInt(h.slice(0, 2), 16) / 255;
@@ -62,7 +62,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [prefs, setPrefs] = useState<ThemePrefs>(() => readJSON(prefsKey(accountKey), DEFAULT_PREFS));
   const [systemDark, setSystemDark] = useState(systemPrefersDark());
 
-  // Reload prefs whenever the active account changes (guest <-> signed in).
+  // reload prefs on account change
   useEffect(() => {
     setPrefs(readJSON(prefsKey(accountKey), DEFAULT_PREFS));
   }, [accountKey]);

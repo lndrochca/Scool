@@ -1,14 +1,21 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../lib/firebase";
 import type { AuthUser } from "../types";
 import * as authApi from "../lib/authApi";
 import { AuthApiError } from "../lib/authApi";
 
-/** What triggered the auth modal to open — lets us show the right copy. */
-export type AuthPromptReason =
-  | "manual"
-  | "save"
-  | "sync"
-  | "settings";
+// why the modal opened
+export type AuthPromptReason = "manual" | "save" | "sync" | "settings";
 
 interface AuthModalState {
   open: boolean;
@@ -19,7 +26,7 @@ interface AuthModalState {
 interface AuthContextValue {
   user: AuthUser | null;
   isGuest: boolean;
-  /** Stable key used to namespace locally-persisted data: "guest" or the user id. */
+  // "guest" or user id
   accountKey: string;
   authLoading: boolean;
   authError: string | null;
@@ -30,16 +37,15 @@ interface AuthContextValue {
   updateName: (name: string) => Promise<void>;
   clearAuthError: () => void;
 
-  /** Modal control */
+  // modal control
   authModal: AuthModalState;
-  openAuthModal: (mode?: "sign-in" | "sign-up", reason?: AuthPromptReason) => void;
+  openAuthModal: (
+    mode?: "sign-in" | "sign-up",
+    reason?: AuthPromptReason
+  ) => void;
   closeAuthModal: () => void;
 
-  /**
-   * Call whenever a guest performs an action that would normally be saved
-   * to the cloud (adding a subject, note, grade, etc). Shows a friendly,
-   * one-time-per-session nudge to sign in — never blocks the action.
-   */
+  // one-time guest nudge
   notifyGuestSave: () => void;
   guestPrompt: { open: boolean };
   dismissGuestPrompt: () => void;
@@ -48,17 +54,39 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  // initial sync from firebase
   const [user, setUser] = useState<AuthUser | null>(() => authApi.getSession());
+  // waiting for first listener fire
+  const [sessionLoading, setSessionLoading] = useState(true);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [authModal, setAuthModal] = useState<AuthModalState>({ open: false, mode: "sign-in", reason: "manual" });
+  const [authModal, setAuthModal] = useState<AuthModalState>({
+    open: false,
+    mode: "sign-in",
+    reason: "manual",
+  });
   const [guestPromptOpen, setGuestPromptOpen] = useState(false);
   const hasShownGuestPrompt = useRef(false);
 
-  const openAuthModal = useCallback((mode: "sign-in" | "sign-up" = "sign-in", reason: AuthPromptReason = "manual") => {
-    setAuthError(null);
-    setAuthModal({ open: true, mode, reason });
+  // sync with firebase auth state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser ? authApi.toAuthUser(firebaseUser) : null);
+      setSessionLoading(false);
+    });
+    return unsubscribe;
   }, []);
+
+  const openAuthModal = useCallback(
+    (
+      mode: "sign-in" | "sign-up" = "sign-in",
+      reason: AuthPromptReason = "manual"
+    ) => {
+      setAuthError(null);
+      setAuthModal({ open: true, mode, reason });
+    },
+    []
+  );
 
   const closeAuthModal = useCallback(() => {
     setAuthModal((prev) => ({ ...prev, open: false }));
@@ -74,28 +102,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthModal((prev) => ({ ...prev, open: false }));
       return true;
     } catch (err) {
-      setAuthError(err instanceof AuthApiError ? err.message : "Something went wrong. Please try again.");
+      setAuthError(
+        err instanceof AuthApiError
+          ? err.message
+          : "Something went wrong. Please try again."
+      );
       return false;
     } finally {
       setAuthLoading(false);
     }
   }, []);
 
-  const signUp = useCallback(async (name: string, email: string, password: string) => {
-    setAuthLoading(true);
-    setAuthError(null);
-    try {
-      const account = await authApi.signUp(name, email, password);
-      setUser(account);
-      setAuthModal((prev) => ({ ...prev, open: false }));
-      return true;
-    } catch (err) {
-      setAuthError(err instanceof AuthApiError ? err.message : "Something went wrong. Please try again.");
-      return false;
-    } finally {
-      setAuthLoading(false);
-    }
-  }, []);
+  const signUp = useCallback(
+    async (name: string, email: string, password: string) => {
+      setAuthLoading(true);
+      setAuthError(null);
+      try {
+        const account = await authApi.signUp(name, email, password);
+        setUser(account);
+        setAuthModal((prev) => ({ ...prev, open: false }));
+        return true;
+      } catch (err) {
+        setAuthError(
+          err instanceof AuthApiError
+            ? err.message
+            : "Something went wrong. Please try again."
+        );
+        return false;
+      } finally {
+        setAuthLoading(false);
+      }
+    },
+    []
+  );
 
   const signOut = useCallback(async () => {
     await authApi.signOut();
@@ -103,11 +142,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     hasShownGuestPrompt.current = false;
   }, []);
 
-  const updateName = useCallback(async (name: string) => {
-    if (!user) return;
-    const updated = await authApi.updateProfile(user.id, { name });
-    setUser(updated);
-  }, [user]);
+  const updateName = useCallback(
+    async (name: string) => {
+      if (!user) return;
+      const updated = await authApi.updateProfile(user.id, { name });
+      setUser(updated);
+    },
+    [user]
+  );
 
   const clearAuthError = useCallback(() => setAuthError(null), []);
 
@@ -125,7 +167,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       isGuest: !user,
       accountKey: user ? user.id : "guest",
-      authLoading,
+      // session check + in-flight combined
+      authLoading: sessionLoading || authLoading,
       authError,
       signIn,
       signUp,
@@ -141,6 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }),
     [
       user,
+      sessionLoading,
       authLoading,
       authError,
       signIn,
@@ -157,7 +201,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

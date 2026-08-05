@@ -34,7 +34,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const loadedAccountKey = useRef(accountKey);
   const prevGradePercents = useRef<Record<string, number> | null>(null);
 
-  // Reload when switching accounts.
+  // reload on account switch
   useEffect(() => {
     if (loadedAccountKey.current === accountKey) return;
     loadedAccountKey.current = accountKey;
@@ -42,7 +42,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     prevGradePercents.current = null;
   }, [accountKey]);
 
-  // Persist on change.
+  // debounced persist
   useEffect(() => {
     const timeout = setTimeout(() => writeJSON(notifKey(accountKey), notifications), 200);
     return () => clearTimeout(timeout);
@@ -60,7 +60,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  // Auto-generate deadline / overdue notifications from live assignment data.
+  // deadline/overdue from assignments
   useEffect(() => {
     if (!hydrated) return;
     const generated: { dedupeKey: string; type: NotificationType; title: string; message: string; subjectId?: string }[] = [];
@@ -94,7 +94,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subjects, assignmentsBySubject, hydrated]);
 
-  // Notify on grade changes (skips the very first snapshot after load/account switch).
+  // notify on grade change
   useEffect(() => {
     if (!hydrated) return;
     if (prevGradePercents.current === null) {
