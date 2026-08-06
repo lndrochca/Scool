@@ -10,7 +10,7 @@ import "./Profile.css";
 
 export function Profile() {
   const { subjects, notes } = useAppData();
-  const { user, isGuest, openAuthModal, signOut, updateName } = useAuth();
+  const { user, isGuest, signOut, updateName } = useAuth();
 
   const [name, setName] = useState(user?.name ?? "");
   const [editingProfile, setEditingProfile] = useState(false);
@@ -60,9 +60,9 @@ export function Profile() {
                 <li>Sign in any time — nothing you've made as a guest is lost</li>
                 <li>Free accounts sync across all your devices</li>
               </ul>
-              <button className="btn-solid guest-hero-cta" onClick={() => openAuthModal("sign-up", "save")}>
-                Sign In / Create Account
-              </button>
+              <p className="guest-hero-sub" style={{ marginTop: 4 }}>
+                Sign out and choose "Sign In" from the welcome screen to create an account.
+              </p>
             </div>
           ) : (
             <div className="card panel settings-panel">

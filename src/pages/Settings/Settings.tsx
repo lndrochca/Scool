@@ -51,7 +51,7 @@ function downloadJSON(filename: string, data: unknown) {
 
 export function Settings() {
   const { mode, setMode, accent, setAccent } = useTheme();
-  const { user, isGuest, openAuthModal, signOut } = useAuth();
+  const { user, isGuest, signOut } = useAuth();
   const appData = useAppData();
 
   const [hexDraft, setHexDraft] = useState(accent);
@@ -138,8 +138,7 @@ export function Settings() {
             />
             {isGuest && (
               <p className="settings-inline-note">
-                Notification preferences need an account to actually deliver anything —{" "}
-                <button className="settings-inline-link" onClick={() => openAuthModal("sign-up", "settings")}>sign in</button> to turn these on.
+                Notification preferences need an account to actually deliver anything — sign in from the welcome screen next time you launch Scool to turn these on.
               </p>
             )}
           </div>
@@ -249,9 +248,9 @@ export function Settings() {
             </div>
             <div className="settings-actions">
               {isGuest ? (
-                <button className="settings-action settings-action--primary" onClick={() => openAuthModal("sign-up", "settings")}>
-                  Sign In / Create Account
-                </button>
+                <div className="settings-row-desc" style={{ padding: "0 16px 4px" }}>
+                  To save this data permanently, sign out and choose "Sign In" from the welcome screen next time you open Scool.
+                </div>
               ) : (
                 <button
                   className="settings-action"

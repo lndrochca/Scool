@@ -1,6 +1,9 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  sendPasswordResetEmail,
   signOut as firebaseSignOut,
   updateProfile as firebaseUpdateProfile,
   type User,
@@ -59,6 +62,25 @@ export async function signIn(
   }
 }
 
+const googleProvider = new GoogleAuthProvider();
+
+export async function signInWithGoogle(): Promise<AuthUser> {
+  try {
+    const credential = await signInWithPopup(auth, googleProvider);
+    return toAuthUser(credential.user);
+  } catch (err: unknown) {
+    throw new AuthApiError(friendlyError(err));
+  }
+}
+
+export async function resetPassword(email: string): Promise<void> {
+  try {
+    await sendPasswordResetEmail(auth, email.trim());
+  } catch (err: unknown) {
+    throw new AuthApiError(friendlyError(err));
+  }
+}
+
 export async function signOut(): Promise<void> {
   await firebaseSignOut(auth);
 }
@@ -104,6 +126,11 @@ function friendlyError(err: unknown): string {
         return "That email and password don't match.";
       case "auth/too-many-requests":
         return "Too many attempts. Please wait a moment and try again.";
+      case "auth/popup-closed-by-user":
+      case "auth/cancelled-popup-request":
+        return "Sign-in was cancelled.";
+      case "auth/popup-blocked":
+        return "Your browser blocked the sign-in popup. Please allow popups and try again.";
       case "auth/network-request-failed":
         return "Network error. Check your connection and try again.";
       default:

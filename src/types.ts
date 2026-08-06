@@ -166,7 +166,7 @@ export type PageName =
   | "notes"
   | "grades"
   | "library"
-  | "bookshelf"
+  | "calendar"
   | "flashcards"
   | "profile"
   | "settings"

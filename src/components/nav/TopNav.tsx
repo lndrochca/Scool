@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import type { PageName } from "../../types";
-import { FlashcardIcon, MenuIcon, SettingsIcon, UserIcon } from "../ui/icons";
+import { CalendarIcon, FlashcardIcon, MenuIcon, SettingsIcon, UserIcon } from "../ui/icons";
 import { useAuth } from "../../context/AuthContext";
 import { NotificationBell } from "./NotificationBell";
 import "./TopNav.css";
@@ -49,15 +49,9 @@ const NAV_ITEMS: { key: PageName; label: string; icon: ReactElement }[] = [
     ),
   },
   {
-    key: "bookshelf",
-    label: "Bookshelf",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <path d="M4 20V6a2 2 0 0 1 2-2h2v16" />
-        <path d="M10 20V4h4l2 16" />
-        <path d="M17 20V7l3 .6V20" />
-      </svg>
-    ),
+    key: "calendar",
+    label: "Calendar",
+    icon: <CalendarIcon />,
   },
   {
     key: "flashcards",

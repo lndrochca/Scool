@@ -4,7 +4,7 @@ import { Dashboard } from "./pages/Dashboard/Dashboard";
 import { Notes } from "./pages/Notes/Notes";
 import { Grades } from "./pages/Grades/Grades";
 import { Library } from "./pages/Library/Library";
-import { Bookshelf } from "./pages/Bookshelf/Bookshelf";
+import { Calendar } from "./pages/Calendar/Calendar";
 import { Flashcards } from "./pages/Flashcards/Flashcards";
 import { SubjectWorkspace } from "./pages/SubjectWorkspace/SubjectWorkspace";
 import { Profile } from "./pages/Profile/Profile";
@@ -13,10 +13,28 @@ import { AppDataProvider, useAppData } from "./context/AppDataContext";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import { AuthModal } from "./components/modals/AuthModal";
 import { GuestPromptModal } from "./components/modals/GuestPromptModal";
+import { AuthScreen } from "./pages/Auth/AuthScreen";
+import { useAuth } from "./context/AuthContext";
 import type { PageName, WorkspaceTabTarget, Note } from "./types";
 import type { QuickActionKind } from "./components/dashboard/QuickActions";
 
 export default function App() {
+  const { hasEnteredApp, authLoading } = useAuth();
+
+  // wait for the first firebase auth-state callback before deciding what to show,
+  // so a signed-in user doesn't briefly flash the auth screen on reload
+  if (authLoading) {
+    return (
+      <div className="app-boot">
+        <span className="app-boot-mark">S</span>
+      </div>
+    );
+  }
+
+  if (!hasEnteredApp) {
+    return <AuthScreen />;
+  }
+
   return (
     <AppDataProvider>
       <NotificationsProvider>
@@ -128,7 +146,9 @@ function AppShell() {
           onAutoOpenConsumed={() => setAutoOpenAddSubject(false)}
         />
       )}
-      {page === "bookshelf" && <Bookshelf onOpenSubject={openSubject} />}
+      {page === "calendar" && (
+        <Calendar onOpenSubject={openSubject} onOpenNote={openNote} />
+      )}
       {page === "flashcards" && (
         <Flashcards
           initialSetId={pendingFlashcardSetId}

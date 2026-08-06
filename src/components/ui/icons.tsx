@@ -749,3 +749,62 @@ export function FolderMoveIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function CalendarIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+      <rect x="3.5" y="5" width="17" height="16" rx="2.5" />
+      <path d="M8 3v4M16 3v4M3.5 10h17" />
+      <circle cx="8.2" cy="14.2" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="14.2" r="1" fill="currentColor" stroke="none" />
+      <circle cx="15.8" cy="14.2" r="1" fill="currentColor" stroke="none" />
+      <circle cx="8.2" cy="17.4" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="17.4" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function GoogleIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24">
+      <path fill="#4285F4" d="M23.5 12.27c0-.82-.07-1.6-.2-2.36H12v4.47h6.47a5.53 5.53 0 0 1-2.4 3.63v3h3.87c2.27-2.09 3.56-5.17 3.56-8.74Z" />
+      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.9l-3.87-3a7.4 7.4 0 0 1-11.02-3.9H1.05v3.1A12 12 0 0 0 12 24Z" />
+      <path fill="#FBBC05" d="M5.04 14.2a7.2 7.2 0 0 1 0-4.6V6.5H1.05a12 12 0 0 0 0 11l3.99-3.3Z" />
+      <path fill="#EA4335" d="M12 4.77c1.76 0 3.35.6 4.6 1.8l3.44-3.44C17.94 1.19 15.24 0 12 0A12 12 0 0 0 1.05 6.5l3.99 3.1A7.16 7.16 0 0 1 12 4.77Z" />
+    </svg>
+  );
+}
+
+export function StudyIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+      <path d="M4 6.5c0-1.1.9-2 2-2h5v15H6a2 2 0 0 1-2-2V6.5Z" />
+      <path d="M20 6.5c0-1.1-.9-2-2-2h-5v15h5a2 2 0 0 0 2-2V6.5Z" />
+    </svg>
+  );
+}
+
+export function DeadlineIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+      <circle cx="12" cy="13" r="8" />
+      <path d="M12 9v4l2.5 1.5" />
+      <path d="M9 2h6" />
+    </svg>
+  );
+}
+
+export function CalculatorIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+      <rect x="5" y="3" width="14" height="18" rx="2.2" />
+      <path d="M8 7h8" />
+      <circle cx="8.3" cy="12" r="0.9" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="0.9" fill="currentColor" stroke="none" />
+      <circle cx="15.7" cy="12" r="0.9" fill="currentColor" stroke="none" />
+      <circle cx="8.3" cy="15.6" r="0.9" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="15.6" r="0.9" fill="currentColor" stroke="none" />
+      <circle cx="15.7" cy="15.6" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}

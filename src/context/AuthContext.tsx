@@ -13,9 +13,13 @@ import { auth } from "../lib/firebase";
 import type { AuthUser } from "../types";
 import * as authApi from "../lib/authApi";
 import { AuthApiError } from "../lib/authApi";
+import { readJSON, writeJSON } from "../lib/storage";
 
 // why the modal opened
 export type AuthPromptReason = "manual" | "save" | "sync" | "settings";
+
+// persisted flag: has this browser explicitly chosen "Continue as Guest"
+const GUEST_ENTERED_KEY = "scool:guest_entered";
 
 interface AuthModalState {
   open: boolean;
@@ -33,9 +37,15 @@ interface AuthContextValue {
 
   signIn: (email: string, password: string) => Promise<boolean>;
   signUp: (name: string, email: string, password: string) => Promise<boolean>;
+  signInWithGoogle: () => Promise<boolean>;
+  resetPassword: (email: string) => Promise<boolean>;
   signOut: () => Promise<void>;
   updateName: (name: string) => Promise<void>;
   clearAuthError: () => void;
+
+  // gate: has the user reached the app (signed in OR explicitly chosen guest mode)?
+  hasEnteredApp: boolean;
+  continueAsGuest: () => void;
 
   // modal control
   authModal: AuthModalState;
@@ -67,6 +77,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
   const [guestPromptOpen, setGuestPromptOpen] = useState(false);
   const hasShownGuestPrompt = useRef(false);
+  const [guestEntered, setGuestEntered] = useState<boolean>(() =>
+    readJSON<boolean>(GUEST_ENTERED_KEY, false)
+  );
 
   // sync with firebase auth state
   useEffect(() => {
@@ -136,10 +149,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const signInWithGoogle = useCallback(async () => {
+    setAuthLoading(true);
+    setAuthError(null);
+    try {
+      const account = await authApi.signInWithGoogle();
+      setUser(account);
+      setAuthModal((prev) => ({ ...prev, open: false }));
+      return true;
+    } catch (err) {
+      // user closing the popup shouldn't read as a hard error
+      if (err instanceof AuthApiError && err.message === "Sign-in was cancelled.") {
+        return false;
+      }
+      setAuthError(
+        err instanceof AuthApiError
+          ? err.message
+          : "Something went wrong. Please try again."
+      );
+      return false;
+    } finally {
+      setAuthLoading(false);
+    }
+  }, []);
+
+  const resetPassword = useCallback(async (email: string) => {
+    setAuthLoading(true);
+    setAuthError(null);
+    try {
+      await authApi.resetPassword(email);
+      return true;
+    } catch (err) {
+      setAuthError(
+        err instanceof AuthApiError
+          ? err.message
+          : "Something went wrong. Please try again."
+      );
+      return false;
+    } finally {
+      setAuthLoading(false);
+    }
+  }, []);
+
+  const continueAsGuest = useCallback(() => {
+    writeJSON(GUEST_ENTERED_KEY, true);
+    setGuestEntered(true);
+  }, []);
+
   const signOut = useCallback(async () => {
     await authApi.signOut();
     setUser(null);
     hasShownGuestPrompt.current = false;
+    // return to the auth gate after logging out
+    writeJSON(GUEST_ENTERED_KEY, false);
+    setGuestEntered(false);
   }, []);
 
   const updateName = useCallback(
@@ -172,9 +235,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authError,
       signIn,
       signUp,
+      signInWithGoogle,
+      resetPassword,
       signOut,
       updateName,
       clearAuthError,
+      hasEnteredApp: !!user || guestEntered,
+      continueAsGuest,
       authModal,
       openAuthModal,
       closeAuthModal,
@@ -189,9 +256,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authError,
       signIn,
       signUp,
+      signInWithGoogle,
+      resetPassword,
       signOut,
       updateName,
       clearAuthError,
+      guestEntered,
+      continueAsGuest,
       authModal,
       openAuthModal,
       closeAuthModal,
